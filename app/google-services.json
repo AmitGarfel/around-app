@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "742077901407",
+    "project_id": "around-2caf5",
+    "storage_bucket": "around-2caf5.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:742077901407:android:ff371c4bfa474d4b3dc9ea",
+        "android_client_info": {
+          "package_name": "com.example.around"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBjn0jVeFDZrW561idYkVmbVEr4ag3J-ew"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

@@ -1,0 +1,287 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <!-- Background image -->
+    <ImageView
+        android:id="@+id/ivHomeBackground"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:src="@drawable/city_bg"
+        android:scaleType="centerCrop"
+        android:contentDescription="@null" />
+
+    <!-- Scroll -->
+    <ScrollView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_above="@id/bottom_navigation"
+        android:fillViewport="true">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:gravity="center_horizontal"
+            android:paddingBottom="20dp">
+
+            <!-- Title pill כמו אצלך -->
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="40dp"
+                android:layout_marginHorizontal="24dp"
+                android:text="Create a new route"
+                android:textColor="#2D2321"
+                android:textSize="20sp"
+                android:textStyle="bold"
+                android:gravity="center"
+                android:background="@drawable/rounded_yellow_bg"
+                android:paddingVertical="14dp"
+                android:layout_marginBottom="18dp" />
+
+            <!-- Main white card (כמו Home/Menu) -->
+            <com.google.android.material.card.MaterialCardView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginHorizontal="24dp"
+                android:layout_marginBottom="24dp"
+                app:cardCornerRadius="24dp"
+                app:cardElevation="12dp"
+                app:cardBackgroundColor="#FFFFFF">
+
+                <!-- פה אנחנו מכריחים LTR כדי ששמאל יהיה שמאל אמיתי -->
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"
+                    android:padding="22dp"
+                    android:layoutDirection="ltr"
+                    android:textDirection="ltr">
+
+                    <!-- Tour name -->
+                    <EditText
+                        android:id="@+id/etTourName"
+                        android:layout_width="match_parent"
+                        android:layout_height="50dp"
+                        android:hint="Tour name"
+                        android:background="@drawable/spinner_bg_light"
+                        android:paddingHorizontal="14dp"
+                        android:textColor="#2D2321"
+                        android:textColorHint="#7A6A5E"
+                        android:layout_marginBottom="12dp" />
+
+                    <!-- City -->
+                    <AutoCompleteTextView
+                        android:id="@+id/etCity"
+                        android:layout_width="match_parent"
+                        android:layout_height="50dp"
+                        android:hint="City: start typing..."
+                        android:background="@drawable/spinner_bg_light"
+                        android:paddingHorizontal="14dp"
+                        android:textColor="#2D2321"
+                        android:textColorHint="#7A6A5E"
+                        android:completionThreshold="1"
+                        android:layout_marginBottom="14dp" />
+
+                    <!-- Label -->
+                    <TextView
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:text="Select Mood:"
+                        android:textColor="#E6C76A"
+                        android:textStyle="bold"
+                        android:gravity="left"
+                        android:layout_marginBottom="6dp" />
+
+                    <Spinner
+                        android:id="@+id/spinnerMood"
+                        android:layout_width="match_parent"
+                        android:layout_height="50dp"
+                        android:background="@drawable/spinner_bg_light"
+                        android:paddingHorizontal="14dp"
+                        android:layout_marginBottom="14dp" />
+
+                    <!-- Label -->
+                    <TextView
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:text="Time Fit:"
+                        android:textColor="#E6C76A"
+                        android:textStyle="bold"
+                        android:gravity="left"
+                        android:layout_marginBottom="6dp" />
+
+                    <Spinner
+                        android:id="@+id/spinnerTimeFit"
+                        android:layout_width="match_parent"
+                        android:layout_height="50dp"
+                        android:background="@drawable/spinner_bg_light"
+                        android:paddingHorizontal="14dp"
+                        android:layout_marginBottom="14dp" />
+
+                    <!-- Label -->
+                    <TextView
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:text="Estimated Duration:"
+                        android:textColor="#E6C76A"
+                        android:textStyle="bold"
+                        android:gravity="left"
+                        android:layout_marginBottom="6dp" />
+
+                    <Spinner
+                        android:id="@+id/spinnerDuration"
+                        android:layout_width="match_parent"
+                        android:layout_height="50dp"
+                        android:background="@drawable/spinner_bg_light"
+                        android:paddingHorizontal="14dp"
+                        android:layout_marginBottom="14dp" />
+
+                    <!-- Description -->
+                    <EditText
+                        android:id="@+id/etDescription"
+                        android:layout_width="match_parent"
+                        android:layout_height="120dp"
+                        android:hint="Tour Description"
+                        android:gravity="top"
+                        android:background="@drawable/spinner_bg_light"
+                        android:padding="14dp"
+                        android:textColor="#2D2321"
+                        android:textColorHint="#7A6A5E"
+                        android:layout_marginBottom="16dp" />
+
+                    <!-- Stations label -->
+                    <TextView
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:text="Stations (up to 4 stops):"
+                        android:textColor="#E6C76A"
+                        android:textStyle="bold"
+                        android:gravity="left"
+                        android:layout_marginBottom="6dp" />
+
+                    <!-- Helper text -->
+                    <TextView
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:text="Write place name + city (e.g., Shuk HaCarmel Tel Aviv)"
+                        android:textColor="#7A6A5E"
+                        android:textSize="12sp"
+                        android:gravity="left"
+                        android:layout_marginBottom="12dp" />
+
+                    <EditText
+                        android:id="@+id/etStation1"
+                        android:layout_width="match_parent"
+                        android:layout_height="50dp"
+                        android:hint="Station 1"
+                        android:background="@drawable/spinner_bg_light"
+                        android:paddingHorizontal="14dp"
+                        android:textColor="#2D2321"
+                        android:textColorHint="#7A6A5E"
+                        android:layout_marginBottom="10dp" />
+
+                    <EditText
+                        android:id="@+id/etStation2"
+                        android:layout_width="match_parent"
+                        android:layout_height="50dp"
+                        android:hint="Station 2"
+                        android:background="@drawable/spinner_bg_light"
+                        android:paddingHorizontal="14dp"
+                        android:textColor="#2D2321"
+                        android:textColorHint="#7A6A5E"
+                        android:layout_marginBottom="10dp" />
+
+                    <EditText
+                        android:id="@+id/etStation3"
+                        android:layout_width="match_parent"
+                        android:layout_height="50dp"
+                        android:hint="Station 3"
+                        android:background="@drawable/spinner_bg_light"
+                        android:paddingHorizontal="14dp"
+                        android:textColor="#2D2321"
+                        android:textColorHint="#7A6A5E"
+                        android:layout_marginBottom="10dp" />
+
+                    <EditText
+                        android:id="@+id/etStation4"
+                        android:layout_width="match_parent"
+                        android:layout_height="50dp"
+                        android:hint="Station 4"
+                        android:background="@drawable/spinner_bg_light"
+                        android:paddingHorizontal="14dp"
+                        android:textColor="#2D2321"
+                        android:textColorHint="#7A6A5E"
+                        android:layout_marginBottom="16dp" />
+
+                    <!-- Buttons -->
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="horizontal"
+                        android:weightSum="2"
+                        android:layout_marginTop="6dp">
+
+                        <Button
+                            android:id="@+id/btnSaveRoute"
+                            android:layout_width="0dp"
+                            android:layout_height="52dp"
+                            android:layout_weight="1"
+                            android:text="Save"
+                            android:layout_marginEnd="8dp"
+                            android:backgroundTint="#E6C76A"
+                            android:textColor="#2D2321"
+                            android:textStyle="bold" />
+
+                        <Button
+                            android:id="@+id/btnExit"
+                            android:layout_width="0dp"
+                            android:layout_height="52dp"
+                            android:layout_weight="1"
+                            android:text="Exit"
+                            android:backgroundTint="#F6F3EE"
+                            android:textColor="#2D2321"
+                            android:textStyle="bold" />
+                    </LinearLayout>
+
+                    <!-- Image -->
+                    <Button
+                        android:id="@+id/btnPickImage"
+                        android:layout_width="match_parent"
+                        android:layout_height="52dp"
+                        android:text="Choose image"
+                        android:backgroundTint="#F6F3EE"
+                        android:textColor="#2D2321"
+                        android:textStyle="bold"
+                        android:layout_marginTop="12dp" />
+
+                    <ImageView
+                        android:id="@+id/ivPreview"
+                        android:layout_width="match_parent"
+                        android:layout_height="180dp"
+                        android:layout_marginTop="12dp"
+                        android:scaleType="centerCrop"
+                        android:visibility="gone"
+                        android:src="@android:drawable/ic_menu_gallery" />
+
+                </LinearLayout>
+            </com.google.android.material.card.MaterialCardView>
+
+        </LinearLayout>
+    </ScrollView>
+
+    <!-- Bottom Navigation (כמו Home/Menu) -->
+    <com.google.android.material.bottomnavigation.BottomNavigationView
+        android:id="@+id/bottom_navigation"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        android:background="#FFFFFF"
+        app:itemIconTint="#2D2321"
+        app:itemTextColor="#2D2321"
+        app:menu="@menu/bottom_nav_menu" />
+
+</RelativeLayout>

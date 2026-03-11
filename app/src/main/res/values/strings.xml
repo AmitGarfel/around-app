@@ -1,0 +1,50 @@
+<resources>
+    <string name="app_name">Around</string>
+    <string-array name="mood_options">
+        <item>culinary</item>
+        <item>culture</item>
+        <item>relax</item>
+        <item>surprise</item>
+    </string-array>
+
+    <string-array name="time_options">
+        <item>Morning</item>
+        <item>Afternoon</item>
+        <item>Evening</item>
+    </string-array>
+
+    <string-array name="cities_options">
+        <item>Tel Aviv</item>
+        <item>Jerusalem</item>
+        <item>Haifa</item>
+        <item>Rishon LeZion</item>
+        <item>Petah Tikva</item>
+        <item>Netanya</item>
+        <item>Holon</item>
+        <item>Bnei Brak</item>
+        <item>Ramat Gan</item>
+        <item>Herzliya</item>
+        <item>Hod HaSharon</item>
+        <item>Kfar Saba</item>
+        <item>Raanana</item>
+    </string-array>
+
+    <string-array name="duration_options">
+        <item>30–60 min</item>
+        <item>1–1.5 hours</item>
+        <item>1.5–2 hours</item>
+        <item>2–3 hours</item>
+        <item>3+ hours</item>
+    </string-array>
+
+    <!-- res/values/strings.xml : add this array -->
+    <string-array name="travel_modes">
+        <item>Driving 🚗</item>
+        <item>Walking 🚶</item>
+        <item>Bike 🚲</item>
+        <item>Transit 🚆</item>
+    </string-array>
+
+
+
+</resources>
