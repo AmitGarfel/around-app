@@ -8,6 +8,7 @@ import com.google.firebase.firestore.FirebaseFirestore
 class ToursRepository(
     private val db: FirebaseFirestore
 ) {
+
     fun getPendingTours(
         onSuccess: (List<Tour>) -> Unit,
         onError: (Exception) -> Unit
@@ -27,15 +28,17 @@ class ToursRepository(
         onSuccess: () -> Unit,
         onError: (Exception) -> Unit
     ) {
-        db.collection("Tours").document(tourId)
+        db.collection("Tours")
+            .document(tourId)
             .update("status", newStatus)
             .addOnSuccessListener { onSuccess() }
             .addOnFailureListener { onError(it) }
     }
 
-    fun getApprovedToursByMoodAndTime(
+    fun getApprovedToursByMoodTimeAndCity(
         mood: String,
         time: String,
+        city: String,
         onSuccess: (List<Tour>) -> Unit,
         onError: (Exception) -> Unit
     ) {
@@ -43,6 +46,7 @@ class ToursRepository(
             .whereEqualTo("mood", mood)
             .whereEqualTo("timeTag", time)
             .whereEqualTo("status", "approved")
+            .whereEqualTo("city", city)
             .get()
             .addOnSuccessListener { docs ->
                 onSuccess(docs.map { it.toTourSafe() })
@@ -66,13 +70,15 @@ class ToursRepository(
         onSuccess: (Tour) -> Unit,
         onError: (Exception) -> Unit
     ) {
-        db.collection("Tours").document(tourId)
+        db.collection("Tours")
+            .document(tourId)
             .get()
             .addOnSuccessListener { doc ->
                 if (!doc.exists()) {
                     onError(IllegalStateException("Tour not found"))
                     return@addOnSuccessListener
                 }
+
                 onSuccess(doc.toTourSafe())
             }
             .addOnFailureListener { onError(it) }
@@ -84,7 +90,8 @@ class ToursRepository(
         onSuccess: () -> Unit,
         onError: (Exception) -> Unit
     ) {
-        db.collection("Tours").document(tourId)
+        db.collection("Tours")
+            .document(tourId)
             .update("stations", updatedStations)
             .addOnSuccessListener { onSuccess() }
             .addOnFailureListener { onError(it) }

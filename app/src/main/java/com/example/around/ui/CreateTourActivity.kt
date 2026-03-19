@@ -14,15 +14,20 @@ import android.widget.Spinner
 import android.widget.Toast
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AppCompatActivity
-import com.example.around.di.AppGraph
+import androidx.lifecycle.lifecycleScope
 import com.example.around.R
+import com.example.around.data.geo.GeocodingRepository
+import com.example.around.di.AppGraph
 import com.example.around.domain.model.Station
 import com.example.around.domain.model.Tour
+import com.google.android.gms.maps.model.LatLng
+import kotlinx.coroutines.launch
 
 class CreateTourActivity : AppCompatActivity() {
 
-    // ✅ במקום Firestore+Storage כאן
     private val createTourUseCase = AppGraph.createTourUseCase
+
+    private lateinit var geocodingRepo: GeocodingRepository
 
     private var selectedImageUri: Uri? = null
 
@@ -41,7 +46,8 @@ class CreateTourActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_create_tour)
 
-        // ✅ חשוב: קודם כל להגדיר adapters של spinners
+        geocodingRepo = AppGraph.geocodingRepo(this)
+
         setupSpinners()
         setupCityAutocomplete()
         setupAutoDurationByStations()
@@ -98,8 +104,9 @@ class CreateTourActivity : AppCompatActivity() {
         val durationSpinner = findViewById<Spinner>(R.id.spinnerDuration)
 
         val watcher = object : TextWatcher {
-            override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {}
-            override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {}
+            override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) = Unit
+            override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) = Unit
+
             override fun afterTextChanged(s: Editable?) {
                 updateDurationDefault(durationSpinner)
             }
@@ -160,37 +167,115 @@ class CreateTourActivity : AppCompatActivity() {
             return
         }
 
-        // ✅ יוצרים Tour בלי URL (ה-UseCase יעדכן אם יש תמונה)
-        val newTour = Tour(
-            name = tourName,
-            city = city,
-            description = description,
-            mood = mood,
-            timeTag = timeFit,
-            estimatedDuration = estimatedDuration,
-            status = "pending",
-            likesCount = 0,
-            imageUrl = "",
-            stations = stationsList
-        )
-
-        val imageUri = selectedImageUri
-        if (imageUri != null) {
-            Toast.makeText(this, "מעלה תמונה... ⏫", Toast.LENGTH_SHORT).show()
+        if (stationsList.isEmpty()) {
+            Toast.makeText(this, "צריך לפחות תחנה אחת", Toast.LENGTH_SHORT).show()
+            return
         }
 
-        createTourUseCase.createTour(
-            tour = newTour,
-            imageUri = imageUri,
-            onSuccess = {
-                Toast.makeText(this, "המסלול נשלח לאישור המערכת!", Toast.LENGTH_LONG).show()
-                finish()
-            },
-            onError = { e ->
-                Log.e("CREATE_TOUR", "Create failed", e)
-                Toast.makeText(this, "שגיאה בשמירה: ${e.localizedMessage}", Toast.LENGTH_LONG)
-                    .show()
+        val firstStation = stationsList.first()
+        val baseQuery = firstStation.query.trim().ifBlank { firstStation.name.trim() }
+
+        val fullQuery = if (
+            city.isNotBlank() &&
+            baseQuery.isNotBlank() &&
+            !baseQuery.contains(city, ignoreCase = true)
+        ) {
+            "$baseQuery, $city"
+        } else {
+            baseQuery
+        }
+
+        lifecycleScope.launch {
+            try {
+                val startLatLng: LatLng? = if (fullQuery.isNotBlank()) {
+                    geocodingRepo.geocode(fullQuery)
+                } else {
+                    null
+                }
+
+                val newTour = Tour(
+                    name = tourName,
+                    city = city,
+                    description = description,
+                    mood = mood,
+                    timeTag = timeFit,
+                    estimatedDuration = estimatedDuration,
+                    status = "pending",
+                    likesCount = 0,
+                    imageUrl = "",
+                    stations = stationsList,
+                    startLatitude = startLatLng?.latitude ?: 0.0,
+                    startLongitude = startLatLng?.longitude ?: 0.0
+                )
+
+                val imageUri = selectedImageUri
+                if (imageUri != null) {
+                    Toast.makeText(
+                        this@CreateTourActivity,
+                        "מעלה תמונה... ⏫",
+                        Toast.LENGTH_SHORT
+                    ).show()
+                }
+
+                createTourUseCase.createTour(
+                    tour = newTour,
+                    imageUri = imageUri,
+                    onSuccess = {
+                        Toast.makeText(
+                            this@CreateTourActivity,
+                            "המסלול נשלח לאישור המערכת!",
+                            Toast.LENGTH_LONG
+                        ).show()
+                        finish()
+                    },
+                    onError = { e ->
+                        Log.e("CREATE_TOUR", "Create failed", e)
+                        Toast.makeText(
+                            this@CreateTourActivity,
+                            "שגיאה בשמירה: ${e.localizedMessage}",
+                            Toast.LENGTH_LONG
+                        ).show()
+                    }
+                )
+            } catch (e: Exception) {
+                Log.e("CREATE_TOUR", "Geocoding failed", e)
+
+                val newTour = Tour(
+                    name = tourName,
+                    city = city,
+                    description = description,
+                    mood = mood,
+                    timeTag = timeFit,
+                    estimatedDuration = estimatedDuration,
+                    status = "pending",
+                    likesCount = 0,
+                    imageUrl = "",
+                    stations = stationsList,
+                    startLatitude = 0.0,
+                    startLongitude = 0.0
+                )
+
+                createTourUseCase.createTour(
+                    tour = newTour,
+                    imageUri = selectedImageUri,
+                    onSuccess = {
+                        Toast.makeText(
+                            this@CreateTourActivity,
+                            "המסלול נשלח לאישור המערכת!",
+                            Toast.LENGTH_LONG
+                        ).show()
+                        finish()
+                    },
+                    onError = { err ->
+                        Log.e("CREATE_TOUR", "Create failed", err)
+                        Toast.makeText(
+                            this@CreateTourActivity,
+                            "שגיאה בשמירה: ${err.localizedMessage}",
+                            Toast.LENGTH_LONG
+                        ).show()
+                    }
+                )
             }
-        )
+        }
     }
 }

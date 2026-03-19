@@ -1,22 +1,24 @@
 package com.example.around.domain.model
 
-import com.example.around.domain.model.Station
 import com.google.firebase.firestore.Exclude
 
 data class Tour(
     val id: String = "",
     val name: String = "",
-    val mood: String = "",          // culinary, culture, relax, surprise
-    val timeTag: String = "",       // Morning, Afternoon, Evening
+    val mood: String = "",
+    val timeTag: String = "",
     val description: String = "",
     val estimatedDuration: String = "",
-    var likesCount: Int = 0,        // שיניתי ל-var כדי שנוכל לעדכן מקומית ב-Adapter
-    val status: String = "pending", // pending / approved / rejected
+    var likesCount: Int = 0,
+    val status: String = "pending",
     val imageUrl: String = "",
     val city: String = "Tel Aviv",
     val stations: List<Station> = emptyList(),
 
-    // --- השדה החדש לפתרון הדיליי ---
-    @get:Exclude // אומר ל-Firebase לא לנסות לשמור/לקרוא את השדה הזה מה-DB
+    // ✅ חדש: נקודת התחלה של המסלול
+    val startLatitude: Double = 0.0,
+    val startLongitude: Double = 0.0,
+
+    @get:Exclude
     var isLikedByMe: Boolean = false
 )

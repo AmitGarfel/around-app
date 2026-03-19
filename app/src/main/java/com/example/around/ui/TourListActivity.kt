@@ -1,15 +1,21 @@
 package com.example.around.ui
 
+import android.Manifest
+import android.content.pm.PackageManager
 import android.os.Bundle
 import android.view.View
 import android.widget.LinearLayout
 import android.widget.TextView
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.content.ContextCompat
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.example.around.R
+import com.example.around.data.geo.LocationDistanceUtils
+import com.example.around.data.geo.LocationHelper
 import com.example.around.di.AppGraph
+import com.example.around.domain.model.Tour
 
 class TourListActivity : AppCompatActivity() {
 
@@ -19,67 +25,135 @@ class TourListActivity : AppCompatActivity() {
 
     private lateinit var recyclerView: RecyclerView
     private lateinit var emptyStateLayout: LinearLayout
+    private lateinit var locationHelper: LocationHelper
+
+    private lateinit var mood: String
+    private lateinit var time: String
+    private lateinit var selectedCity: String
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_tour_list)
 
-        val mood = intent.getStringExtra("MOOD") ?: "culinary"
-        val time = intent.getStringExtra("TIME") ?: "Evening"
-
-        findViewById<TextView>(R.id.listTitle).text = "$mood routes"
-        findViewById<TextView>(R.id.listSubtitle).text = "Perfect for $time ✨"
+        mood = intent.getStringExtra("MOOD") ?: "culinary"
+        time = intent.getStringExtra("TIME") ?: "Evening"
+        selectedCity = intent.getStringExtra("CITY") ?: "Tel Aviv"
 
         recyclerView = findViewById(R.id.toursRecyclerView)
         emptyStateLayout = findViewById(R.id.emptyStateLayout)
+        locationHelper = LocationHelper(this)
+
         recyclerView.layoutManager = LinearLayoutManager(this)
 
-        fetchTours(mood, time)
+        findViewById<TextView>(R.id.listTitle).text = "$mood routes"
+        findViewById<TextView>(R.id.listSubtitle).text = "Perfect for $time in $selectedCity ✨"
+
+        fetchTours()
     }
 
-    private fun fetchTours(mood: String, time: String) {
+    private fun fetchTours() {
+        // ✅ יעיל: כבר בשרת/Firestore נטען רק מסלולים של העיר שנבחרה
         loadToursUseCase.load(
             mood = mood,
             time = time,
+            city = selectedCity,
             onSuccess = { tours ->
-
                 if (tours.isEmpty()) {
-                    recyclerView.visibility = View.GONE
-                    emptyStateLayout.visibility = View.VISIBLE
+                    showTours(emptyList())
                     return@load
-                } else {
-                    recyclerView.visibility = View.VISIBLE
-                    emptyStateLayout.visibility = View.GONE
                 }
 
-                val userId = auth.currentUser?.uid
-
-                recyclerView.adapter =
-                    TourAdapter(tours) { tourItem, prevLiked, prevCount, doneUi ->
-
-                        if (userId == null) {
-                            doneUi()
-                            return@TourAdapter
-                        }
-
-                        likesRepo.toggleLike(
-                            tourId = tourItem.id,
-                            onDone = { isLikedNow, finalCount ->
-                                tourItem.isLikedByMe = isLikedNow
-                                if (finalCount != null) tourItem.likesCount = finalCount
-                                doneUi()
-                            },
-                            onError = {
-                                tourItem.isLikedByMe = prevLiked
-                                tourItem.likesCount = prevCount
-                                doneUi()
-                            }
-                        )
-                    }
+                sortAndShowTours(tours)
             },
-            onError = {
-                Toast.makeText(this, "Error fetching data", Toast.LENGTH_SHORT).show()
+            onError = { e ->
+                Toast.makeText(
+                    this,
+                    "Error fetching tours: ${e.localizedMessage ?: "unknown error"}",
+                    Toast.LENGTH_SHORT
+                ).show()
+                showTours(emptyList())
             }
         )
+    }
+
+    private fun sortAndShowTours(tours: List<Tour>) {
+        // אם אין הרשאת מיקום, פשוט נציג את המסלולים כמו שהם
+        if (!hasLocationPermission()) {
+            showTours(tours)
+            return
+        }
+
+        locationHelper.getCurrentLatLng { userLatLng ->
+            if (userLatLng == null) {
+                showTours(tours)
+                return@getCurrentLatLng
+            }
+
+            val sortedTours = tours.sortedBy { tour ->
+                if (tour.startLatitude == 0.0 && tour.startLongitude == 0.0) {
+                    Float.MAX_VALUE
+                } else {
+                    LocationDistanceUtils.distanceInKm(
+                        fromLat = userLatLng.latitude,
+                        fromLng = userLatLng.longitude,
+                        toLat = tour.startLatitude,
+                        toLng = tour.startLongitude
+                    )
+                }
+            }
+
+            showTours(sortedTours)
+        }
+    }
+
+    private fun showTours(tours: List<Tour>) {
+        if (tours.isEmpty()) {
+            recyclerView.visibility = View.GONE
+            emptyStateLayout.visibility = View.VISIBLE
+            recyclerView.adapter = null
+            return
+        }
+
+        recyclerView.visibility = View.VISIBLE
+        emptyStateLayout.visibility = View.GONE
+
+        val userId = auth.currentUser?.uid
+
+        recyclerView.adapter = TourAdapter(tours) { tourItem, prevLiked, prevCount, doneUi ->
+            if (userId == null) {
+                doneUi()
+                return@TourAdapter
+            }
+
+            likesRepo.toggleLike(
+                tourId = tourItem.id,
+                onDone = { isLikedNow, finalCount ->
+                    tourItem.isLikedByMe = isLikedNow
+                    if (finalCount != null) {
+                        tourItem.likesCount = finalCount
+                    }
+                    doneUi()
+                },
+                onError = {
+                    tourItem.isLikedByMe = prevLiked
+                    tourItem.likesCount = prevCount
+                    doneUi()
+                }
+            )
+        }
+    }
+
+    private fun hasLocationPermission(): Boolean {
+        val fineGranted = ContextCompat.checkSelfPermission(
+            this,
+            Manifest.permission.ACCESS_FINE_LOCATION
+        ) == PackageManager.PERMISSION_GRANTED
+
+        val coarseGranted = ContextCompat.checkSelfPermission(
+            this,
+            Manifest.permission.ACCESS_COARSE_LOCATION
+        ) == PackageManager.PERMISSION_GRANTED
+
+        return fineGranted || coarseGranted
     }
 }

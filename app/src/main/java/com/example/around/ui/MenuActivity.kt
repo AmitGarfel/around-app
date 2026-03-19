@@ -10,9 +10,9 @@ import android.widget.ImageButton
 import android.widget.LinearLayout
 import android.widget.TextView
 import androidx.core.app.ActivityCompat
-import com.example.around.di.AppGraph
-import com.example.around.data.geo.LocationHelper
 import com.example.around.R
+import com.example.around.data.geo.LocationHelper
+import com.example.around.di.AppGraph
 import com.example.around.ui.base.BaseActivity
 
 class MenuActivity : BaseActivity() {
@@ -23,14 +23,14 @@ class MenuActivity : BaseActivity() {
     private lateinit var tvQuickInfo: TextView
     private lateinit var locationHelper: LocationHelper
 
+    private var detectedCity: String = "Tel Aviv"
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_menu)
 
         setupBottomNav(R.id.nav_menu)
 
-
-        // אתחול רכיבים
         val mainLayout = findViewById<LinearLayout>(R.id.menuMainLayout)
         val adminLayout = findViewById<LinearLayout>(R.id.layoutAdmin)
         val btnLogout = findViewById<ImageButton>(R.id.btnLogout)
@@ -41,11 +41,9 @@ class MenuActivity : BaseActivity() {
 
         locationHelper = LocationHelper(this)
 
-        // אנימציית כניסה למסך
         val fadeIn = AnimationUtils.loadAnimation(this, R.anim.fade_in)
         mainLayout.startAnimation(fadeIn)
 
-        // בדיקת הרשאות ועדכון המיקום
         checkLocationPermission()
 
         if (!isUserLoggedIn()) {
@@ -53,15 +51,22 @@ class MenuActivity : BaseActivity() {
             return
         }
 
-
         val uid = auth.currentUser?.uid ?: return
         checkAdminStatus(uid, adminLayout)
 
+        btnCreate.setOnClickListener {
+            startActivity(Intent(this, CreateTourActivity::class.java))
+        }
 
-        // Navigation (Buttons)
-        btnCreate.setOnClickListener { startActivity(Intent(this, CreateTourActivity::class.java)) }
-        btnSelect.setOnClickListener { startActivity(Intent(this, HomeActivity::class.java)) }
-        btnAdmin.setOnClickListener { startActivity(Intent(this, AdminActivity::class.java)) }
+        btnSelect.setOnClickListener {
+            val intent = Intent(this, HomeActivity::class.java)
+            intent.putExtra("CITY", detectedCity)
+            startActivity(intent)
+        }
+
+        btnAdmin.setOnClickListener {
+            startActivity(Intent(this, AdminActivity::class.java))
+        }
 
         btnLogout.setOnClickListener {
             auth.signOut()
@@ -70,7 +75,8 @@ class MenuActivity : BaseActivity() {
     }
 
     private fun checkLocationPermission() {
-        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION)
+        if (
+            ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION)
             == PackageManager.PERMISSION_GRANTED
         ) {
             fetchCity()
@@ -85,6 +91,7 @@ class MenuActivity : BaseActivity() {
 
     private fun fetchCity() {
         locationHelper.getCityName { cityName ->
+            detectedCity = cityName
             tvQuickInfo.text = "Near you: $cityName Tours"
         }
     }
@@ -95,7 +102,12 @@ class MenuActivity : BaseActivity() {
         grantResults: IntArray
     ) {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults)
-        if (requestCode == 100 && grantResults.isNotEmpty() && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+
+        if (
+            requestCode == 100 &&
+            grantResults.isNotEmpty() &&
+            grantResults[0] == PackageManager.PERMISSION_GRANTED
+        ) {
             fetchCity()
         }
     }

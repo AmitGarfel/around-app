@@ -40,6 +40,10 @@ fun DocumentSnapshot.toTourSafe(): Tour {
         status = getString("status") ?: "pending",
         imageUrl = getString("imageUrl") ?: "",
         city = getString("city") ?: "Tel Aviv",
-        stations = stationsList
+        stations = stationsList,
+
+        // ✅ חדש
+        startLatitude = getDouble("startLatitude") ?: 0.0,
+        startLongitude = getDouble("startLongitude") ?: 0.0
     )
 }

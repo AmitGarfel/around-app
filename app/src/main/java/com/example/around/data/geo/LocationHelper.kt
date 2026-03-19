@@ -5,6 +5,7 @@ import android.content.Context
 import android.location.Geocoder
 import com.google.android.gms.location.LocationServices
 import com.google.android.gms.location.Priority
+import com.google.android.gms.maps.model.LatLng
 import java.util.Locale
 
 class LocationHelper(private val context: Context) {
@@ -28,7 +29,6 @@ class LocationHelper(private val context: Context) {
             if (location != null) {
                 geocodeCity(location.latitude, location.longitude)
             } else {
-                // fallback if lastLocation is null
                 fused.getCurrentLocation(Priority.PRIORITY_BALANCED_POWER_ACCURACY, null)
                     .addOnSuccessListener { loc2 ->
                         if (loc2 != null) geocodeCity(loc2.latitude, loc2.longitude)
@@ -38,6 +38,31 @@ class LocationHelper(private val context: Context) {
             }
         }.addOnFailureListener {
             onResult("local tours")
+        }
+    }
+
+    @SuppressLint("MissingPermission")
+    fun getCurrentLatLng(onResult: (LatLng?) -> Unit) {
+        val fused = LocationServices.getFusedLocationProviderClient(context)
+
+        fused.lastLocation.addOnSuccessListener { location ->
+            if (location != null) {
+                onResult(LatLng(location.latitude, location.longitude))
+            } else {
+                fused.getCurrentLocation(Priority.PRIORITY_BALANCED_POWER_ACCURACY, null)
+                    .addOnSuccessListener { loc2 ->
+                        if (loc2 != null) {
+                            onResult(LatLng(loc2.latitude, loc2.longitude))
+                        } else {
+                            onResult(null)
+                        }
+                    }
+                    .addOnFailureListener {
+                        onResult(null)
+                    }
+            }
+        }.addOnFailureListener {
+            onResult(null)
         }
     }
 }

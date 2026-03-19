@@ -3,6 +3,7 @@ package com.example.around.ui
 import android.content.Intent
 import android.os.Bundle
 import android.view.animation.AnimationUtils
+import android.widget.ArrayAdapter
 import android.widget.GridLayout
 import android.widget.LinearLayout
 import android.widget.Spinner
@@ -13,6 +14,8 @@ import java.util.Calendar
 
 class HomeActivity : BaseActivity() {
 
+    private var detectedCity: String = "Tel Aviv"
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_home)
@@ -21,9 +24,11 @@ class HomeActivity : BaseActivity() {
 
         val greetingTv = findViewById<TextView>(R.id.tvGreeting)
         val timeSpinner = findViewById<Spinner>(R.id.spinnerTimeOverride)
+        val citySpinner = findViewById<Spinner>(R.id.spinnerCityOverride)
 
-        val userName = "Amit" // later: from Firestore
+        detectedCity = intent.getStringExtra("CITY") ?: "Tel Aviv"
 
+        val userName = "Amit"
         val autoTimeContext = getAutomaticTimeContext()
 
         val emoji = when (autoTimeContext) {
@@ -40,7 +45,8 @@ class HomeActivity : BaseActivity() {
 
         setupGridAnimation()
         setSpinnerToAutoTime(timeSpinner, autoTimeContext)
-        setupMoodButtons(timeSpinner)
+        setupCitySpinner(citySpinner)
+        setupMoodButtons(timeSpinner, citySpinner)
     }
 
     override fun onStart() {
@@ -78,28 +84,72 @@ class HomeActivity : BaseActivity() {
         if (index >= 0) spinner.setSelection(index)
     }
 
-    private fun setupMoodButtons(timeSpinner: Spinner) {
-        fun selectedTime(): String =
-            timeSpinner.selectedItem?.toString() ?: getAutomaticTimeContext()
+    private fun setupCitySpinner(citySpinner: Spinner) {
+        val baseCities = resources.getStringArray(R.array.cities_options)
+            .map { it.trim() }
+            .filter { it.isNotBlank() }
+            .filterNot { normalizeCity(it) == normalizeCity(detectedCity) }
+
+        val cityOptions = mutableListOf<String>()
+        cityOptions.add("Near me ($detectedCity)")
+        cityOptions.addAll(baseCities)
+
+        val adapter = ArrayAdapter(
+            this,
+            android.R.layout.simple_spinner_item,
+            cityOptions
+        )
+        adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
+        citySpinner.adapter = adapter
+        citySpinner.setSelection(0)
+    }
+
+    private fun setupMoodButtons(timeSpinner: Spinner, citySpinner: Spinner) {
+        fun selectedTime(): String {
+            return timeSpinner.selectedItem?.toString() ?: getAutomaticTimeContext()
+        }
+
+        fun selectedCity(): String {
+            val selected = citySpinner.selectedItem?.toString()?.trim().orEmpty()
+
+            return if (selected.startsWith("Near me", ignoreCase = true) || selected.isBlank()) {
+                detectedCity
+            } else {
+                selected
+            }
+        }
 
         findViewById<LinearLayout>(R.id.moodFoody).setOnClickListener {
-            openTourList("culinary", selectedTime())
+            openTourList("culinary", selectedTime(), selectedCity())
         }
+
         findViewById<LinearLayout>(R.id.moodCulture).setOnClickListener {
-            openTourList("culture", selectedTime())
+            openTourList("culture", selectedTime(), selectedCity())
         }
+
         findViewById<LinearLayout>(R.id.moodRelax).setOnClickListener {
-            openTourList("relax", selectedTime())
+            openTourList("relax", selectedTime(), selectedCity())
         }
+
         findViewById<LinearLayout>(R.id.moodSurprise).setOnClickListener {
-            openTourList("surprise", selectedTime())
+            openTourList("surprise", selectedTime(), selectedCity())
         }
     }
 
-    private fun openTourList(mood: String, time: String) {
+    private fun openTourList(mood: String, time: String, city: String) {
         val intent = Intent(this, TourListActivity::class.java)
         intent.putExtra("MOOD", mood)
         intent.putExtra("TIME", time)
+        intent.putExtra("CITY", city)
         startActivity(intent)
+    }
+
+    private fun normalizeCity(city: String): String {
+        return city
+            .trim()
+            .lowercase()
+            .replace("-", " ")
+            .replace(Regex("\\s+"), " ")
+            .replace("ha sharon", "hasharon")
     }
 }
