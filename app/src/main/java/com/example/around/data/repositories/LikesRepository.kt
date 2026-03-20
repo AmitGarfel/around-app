@@ -12,11 +12,17 @@ class LikesRepository(
     fun checkIfLiked(tourId: String, onResult: (Boolean) -> Unit) {
         val uid = auth.currentUser?.uid ?: return onResult(false)
 
-        db.collection("Tours").document(tourId)
-            .collection("likes").document(uid)
+        db.collection("Tours")
+            .document(tourId)
+            .collection("likes")
+            .document(uid)
             .get()
-            .addOnSuccessListener { snap -> onResult(snap.exists()) }
-            .addOnFailureListener { onResult(false) }
+            .addOnSuccessListener { snap ->
+                onResult(snap.exists())
+            }
+            .addOnFailureListener {
+                onResult(false)
+            }
     }
 
     fun toggleLike(
@@ -37,18 +43,16 @@ class LikesRepository(
             val currentCount = (tourSnap.getLong("likesCount") ?: 0L).toInt()
 
             if (likeSnap.exists()) {
-                // UNLIKE
                 tx.delete(likeRef)
                 tx.update(tourRef, "likesCount", FieldValue.increment(-1))
                 Pair(false, (currentCount - 1).coerceAtLeast(0))
             } else {
-                // LIKE
                 tx.set(likeRef, mapOf("createdAt" to FieldValue.serverTimestamp()))
                 tx.update(tourRef, "likesCount", FieldValue.increment(1))
                 Pair(true, currentCount + 1)
             }
-        }.addOnSuccessListener { (isLikedNow, newCount) ->
-            onDone(isLikedNow, newCount)
+        }.addOnSuccessListener { result ->
+            onDone(result.first, result.second)
         }.addOnFailureListener { e ->
             onError(e)
         }

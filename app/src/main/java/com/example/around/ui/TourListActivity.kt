@@ -52,7 +52,6 @@ class TourListActivity : AppCompatActivity() {
     }
 
     private fun fetchTours() {
-        // ✅ יעיל: כבר בשרת/Firestore נטען רק מסלולים של העיר שנבחרה
         loadToursUseCase.load(
             mood = mood,
             time = time,
@@ -77,7 +76,6 @@ class TourListActivity : AppCompatActivity() {
     }
 
     private fun sortAndShowTours(tours: List<Tour>) {
-        // אם אין הרשאת מיקום, פשוט נציג את המסלולים כמו שהם
         if (!hasLocationPermission()) {
             showTours(tours)
             return

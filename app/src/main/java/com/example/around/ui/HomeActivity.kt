@@ -26,7 +26,7 @@ class HomeActivity : BaseActivity() {
         val timeSpinner = findViewById<Spinner>(R.id.spinnerTimeOverride)
         val citySpinner = findViewById<Spinner>(R.id.spinnerCityOverride)
 
-        detectedCity = intent.getStringExtra("CITY") ?: "Tel Aviv"
+        detectedCity = canonicalCity(intent.getStringExtra("CITY") ?: "Tel Aviv")
 
         val userName = "Amit"
         val autoTimeContext = getAutomaticTimeContext()
@@ -86,9 +86,10 @@ class HomeActivity : BaseActivity() {
 
     private fun setupCitySpinner(citySpinner: Spinner) {
         val baseCities = resources.getStringArray(R.array.cities_options)
-            .map { it.trim() }
+            .map { canonicalCity(it) }
+            .distinct()
             .filter { it.isNotBlank() }
-            .filterNot { normalizeCity(it) == normalizeCity(detectedCity) }
+            .filterNot { it.equals(detectedCity, ignoreCase = true) }
 
         val cityOptions = mutableListOf<String>()
         cityOptions.add("Near me ($detectedCity)")
@@ -115,7 +116,7 @@ class HomeActivity : BaseActivity() {
             return if (selected.startsWith("Near me", ignoreCase = true) || selected.isBlank()) {
                 detectedCity
             } else {
-                selected
+                canonicalCity(selected)
             }
         }
 
@@ -140,16 +141,17 @@ class HomeActivity : BaseActivity() {
         val intent = Intent(this, TourListActivity::class.java)
         intent.putExtra("MOOD", mood)
         intent.putExtra("TIME", time)
-        intent.putExtra("CITY", city)
+        intent.putExtra("CITY", canonicalCity(city))
         startActivity(intent)
     }
 
-    private fun normalizeCity(city: String): String {
-        return city
-            .trim()
-            .lowercase()
-            .replace("-", " ")
-            .replace(Regex("\\s+"), " ")
-            .replace("ha sharon", "hasharon")
+    private fun canonicalCity(city: String): String {
+        return when (city.trim().lowercase()) {
+            "hod hasharon", "hod-ha-sharon", "hod ha sharon" -> "Hod Hasharon"
+            "tel aviv", "tel-aviv" -> "Tel Aviv"
+            "petah tikva", "petah-tikva" -> "Petah Tikva"
+            "rishon lezion", "rishon le zion", "rishon-lezion" -> "Rishon LeZion"
+            else -> city.trim()
+        }
     }
 }

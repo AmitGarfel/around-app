@@ -26,7 +26,6 @@ import kotlinx.coroutines.launch
 class CreateTourActivity : AppCompatActivity() {
 
     private val createTourUseCase = AppGraph.createTourUseCase
-
     private lateinit var geocodingRepo: GeocodingRepository
 
     private var selectedImageUri: Uri? = null
@@ -143,9 +142,19 @@ class CreateTourActivity : AppCompatActivity() {
         }
     }
 
+    private fun canonicalCity(city: String): String {
+        return when (city.trim()) {
+            "Hod HaSharon" -> "Hod Hasharon"
+            "Tel-Aviv" -> "Tel Aviv"
+            "Petah-Tikva" -> "Petah Tikva"
+            else -> city.trim()
+        }
+    }
+
     private fun saveTour() {
         val tourName = findViewById<EditText>(R.id.etTourName).text.toString().trim()
-        val city = findViewById<AutoCompleteTextView>(R.id.etCity).text.toString().trim()
+        val cityRaw = findViewById<AutoCompleteTextView>(R.id.etCity).text.toString().trim()
+        val city = canonicalCity(cityRaw)
         val description = findViewById<EditText>(R.id.etDescription).text.toString().trim()
 
         val mood = findViewById<Spinner>(R.id.spinnerMood).selectedItem.toString().trim()
@@ -171,6 +180,8 @@ class CreateTourActivity : AppCompatActivity() {
             Toast.makeText(this, "צריך לפחות תחנה אחת", Toast.LENGTH_SHORT).show()
             return
         }
+
+        val uid = AppGraph.auth.currentUser?.uid ?: ""
 
         val firstStation = stationsList.first()
         val baseQuery = firstStation.query.trim().ifBlank { firstStation.name.trim() }
@@ -205,7 +216,8 @@ class CreateTourActivity : AppCompatActivity() {
                     imageUrl = "",
                     stations = stationsList,
                     startLatitude = startLatLng?.latitude ?: 0.0,
-                    startLongitude = startLatLng?.longitude ?: 0.0
+                    startLongitude = startLatLng?.longitude ?: 0.0,
+                    createdBy = uid
                 )
 
                 val imageUri = selectedImageUri
@@ -252,7 +264,8 @@ class CreateTourActivity : AppCompatActivity() {
                     imageUrl = "",
                     stations = stationsList,
                     startLatitude = 0.0,
-                    startLongitude = 0.0
+                    startLongitude = 0.0,
+                    createdBy = uid
                 )
 
                 createTourUseCase.createTour(

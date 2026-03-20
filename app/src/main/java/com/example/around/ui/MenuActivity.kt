@@ -32,13 +32,18 @@ class MenuActivity : BaseActivity() {
         setupBottomNav(R.id.nav_menu)
 
         val mainLayout = findViewById<LinearLayout>(R.id.menuMainLayout)
-        val adminLayout = findViewById<LinearLayout>(R.id.layoutAdmin)
-        val btnLogout = findViewById<ImageButton>(R.id.btnLogout)
-        val btnCreate = findViewById<ImageButton>(R.id.btnCreate)
-        val btnSelect = findViewById<ImageButton>(R.id.btnSelect)
-        val btnAdmin = findViewById<ImageButton>(R.id.btnAdmin)
-        tvQuickInfo = findViewById(R.id.tvQuickInfo)
 
+        val layoutRegularActions = findViewById<LinearLayout>(R.id.layoutRegularActions)
+        val layoutAdminActions = findViewById<LinearLayout>(R.id.layoutAdminActions)
+
+        val btnCreateRegular = findViewById<ImageButton>(R.id.btnCreateRegular)
+        val btnExploreRegular = findViewById<ImageButton>(R.id.btnExploreRegular)
+
+        val btnCreateAdmin = findViewById<ImageButton>(R.id.btnCreateAdmin)
+        val btnExploreAdmin = findViewById<ImageButton>(R.id.btnExploreAdmin)
+        val btnAdmin = findViewById<ImageButton>(R.id.btnAdmin)
+
+        tvQuickInfo = findViewById(R.id.tvQuickInfo)
         locationHelper = LocationHelper(this)
 
         val fadeIn = AnimationUtils.loadAnimation(this, R.anim.fade_in)
@@ -52,26 +57,41 @@ class MenuActivity : BaseActivity() {
         }
 
         val uid = auth.currentUser?.uid ?: return
-        checkAdminStatus(uid, adminLayout)
+        checkAdminStatus(
+            uid = uid,
+            regularLayout = layoutRegularActions,
+            adminLayout = layoutAdminActions
+        )
 
-        btnCreate.setOnClickListener {
-            startActivity(Intent(this, CreateTourActivity::class.java))
+        btnCreateRegular.setOnClickListener {
+            openCreate()
         }
 
-        btnSelect.setOnClickListener {
-            val intent = Intent(this, HomeActivity::class.java)
-            intent.putExtra("CITY", detectedCity)
-            startActivity(intent)
+        btnExploreRegular.setOnClickListener {
+            openExplore()
+        }
+
+        btnCreateAdmin.setOnClickListener {
+            openCreate()
+        }
+
+        btnExploreAdmin.setOnClickListener {
+            openExplore()
         }
 
         btnAdmin.setOnClickListener {
             startActivity(Intent(this, AdminActivity::class.java))
         }
+    }
 
-        btnLogout.setOnClickListener {
-            auth.signOut()
-            goToLogin()
-        }
+    private fun openCreate() {
+        startActivity(Intent(this, CreateTourActivity::class.java))
+    }
+
+    private fun openExplore() {
+        val intent = Intent(this, HomeActivity::class.java)
+        intent.putExtra("CITY", detectedCity)
+        startActivity(intent)
     }
 
     private fun checkLocationPermission() {
@@ -112,10 +132,18 @@ class MenuActivity : BaseActivity() {
         }
     }
 
-    private fun checkAdminStatus(uid: String, adminLayout: View) {
+    private fun checkAdminStatus(
+        uid: String,
+        regularLayout: View,
+        adminLayout: View
+    ) {
         usersRepo.isAdmin(uid) { isAdmin ->
             if (isAdmin) {
+                regularLayout.visibility = View.GONE
                 adminLayout.visibility = View.VISIBLE
+            } else {
+                regularLayout.visibility = View.VISIBLE
+                adminLayout.visibility = View.GONE
             }
         }
     }

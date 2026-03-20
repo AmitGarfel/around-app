@@ -19,12 +19,10 @@ class SettingsActivity : BaseActivity() {
         setupBottomNav(R.id.nav_settings)
 
         val tvEmail = findViewById<TextView>(R.id.tvEmail)
-        val tvUid = findViewById<TextView>(R.id.tvUid)
         val btnLogout = findViewById<Button>(R.id.btnLogout)
 
         val user = auth.currentUser
-        tvEmail.text = user?.email ?: "—"
-        tvUid.text = user?.uid ?: "—"
+        tvEmail.text = user?.email ?: "No email available"
 
         btnLogout.setOnClickListener {
             auth.signOut()

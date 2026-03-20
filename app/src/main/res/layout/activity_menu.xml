@@ -4,193 +4,307 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
+    <!-- Background -->
     <ImageView
         android:id="@+id/ivBackground"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:src="@drawable/city_bg"
         android:scaleType="centerCrop"
-        android:contentDescription="Background Image" />
+        android:contentDescription="@null" />
 
+    <!-- Overlay -->
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="#5E000000" />
 
+    <!-- Main content -->
     <LinearLayout
         android:id="@+id/menuMainLayout"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:orientation="vertical"
         android:gravity="center_horizontal"
-        android:animateLayoutChanges="true">
+        android:animateLayoutChanges="true"
+        android:paddingHorizontal="20dp">
 
-        <RelativeLayout
-            android:layout_width="match_parent"
+        <!-- Logo -->
+        <TextView
+            android:id="@+id/tvAppTitle"
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:padding="24dp"
-            android:layout_marginTop="40dp">
+            android:layout_marginTop="72dp"
+            android:text="AROUND"
+            android:textColor="#2D2321"
+            android:textSize="26sp"
+            android:textStyle="bold"
+            android:background="@drawable/rounded_yellow_bg"
+            android:paddingHorizontal="34dp"
+            android:paddingVertical="12dp" />
 
-            <ImageButton
-                android:id="@+id/btnLogout"
-                android:layout_width="48dp"
-                android:layout_height="48dp"
-                android:background="@drawable/rounded_yellow_bg"
-                android:src="@android:drawable/ic_lock_power_off"
-                app:tint="#2D2321"
-                android:padding="8dp"
-                android:contentDescription="Logout Button" />
-
-            <TextView
-                android:id="@+id/tvAppTitle"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_centerInParent="true"
-                android:text="AROUND"
-                android:textColor="#2D2321"
-                android:textSize="24sp"
-                android:textStyle="bold"
-                android:background="@drawable/rounded_yellow_bg"
-                android:paddingHorizontal="24dp"
-                android:paddingVertical="8dp" />
-        </RelativeLayout>
+        <!-- Subtitle -->
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="34dp"
+            android:text="Start your next city experience"
+            android:textColor="#FFFFFF"
+            android:textSize="15sp"
+            android:alpha="0.85" />
 
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="Choose your next step"
             android:textColor="#FFFFFF"
-            android:textSize="22sp"
+            android:textSize="30sp"
             android:textStyle="bold"
-            android:layout_marginTop="20dp" />
+            android:layout_marginTop="8dp" />
 
+        <!-- Card -->
         <com.google.android.material.card.MaterialCardView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_margin="24dp"
-            app:cardCornerRadius="24dp"
-            app:cardElevation="12dp"
-            app:cardBackgroundColor="#FFFFFF">
+            android:layout_marginTop="34dp"
+            android:layout_marginHorizontal="8dp"
+            app:cardCornerRadius="30dp"
+            app:cardElevation="16dp"
+            app:cardBackgroundColor="#FDFDFD">
 
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:orientation="vertical"
-                android:padding="32dp">
+                android:padding="24dp">
 
+                <!-- Regular user -->
                 <LinearLayout
+                    android:id="@+id/layoutRegularActions"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:orientation="horizontal"
-                    android:weightSum="3">
+                    android:gravity="center"
+                    android:visibility="gone">
 
+                    <!-- Explore -->
                     <LinearLayout
                         android:layout_width="0dp"
                         android:layout_height="wrap_content"
                         android:layout_weight="1"
                         android:gravity="center"
                         android:orientation="vertical">
+
                         <ImageButton
-                            android:id="@+id/btnSelect"
-                            android:layout_width="65dp"
-                            android:layout_height="65dp"
+                            android:id="@+id/btnExploreRegular"
+                            android:layout_width="82dp"
+                            android:layout_height="82dp"
                             android:background="@drawable/rounded_yellow_bg"
+                            android:padding="20dp"
                             android:src="@android:drawable/ic_menu_search"
-                            app:tint="#2D2321"
-                            android:padding="14dp"
-                            android:contentDescription="Explore Button" />
+                            android:contentDescription="Explore"
+                            app:tint="#2D2321" />
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="12dp"
+                            android:text="Explore"
+                            android:textColor="#2D2321"
+                            android:textStyle="bold"
+                            android:textSize="17sp" />
+                    </LinearLayout>
+
+                    <Space
+                        android:layout_width="28dp"
+                        android:layout_height="1dp" />
+
+                    <!-- Create -->
+                    <LinearLayout
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:gravity="center"
+                        android:orientation="vertical">
+
+                        <ImageButton
+                            android:id="@+id/btnCreateRegular"
+                            android:layout_width="82dp"
+                            android:layout_height="82dp"
+                            android:background="@drawable/rounded_yellow_bg"
+                            android:padding="20dp"
+                            android:src="@android:drawable/ic_menu_edit"
+                            android:contentDescription="Create"
+                            app:tint="#2D2321" />
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="12dp"
+                            android:text="Create"
+                            android:textColor="#2D2321"
+                            android:textStyle="bold"
+                            android:textSize="17sp" />
+                    </LinearLayout>
+                </LinearLayout>
+
+                <!-- Admin -->
+                <LinearLayout
+                    android:id="@+id/layoutAdminActions"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+                    android:weightSum="3"
+                    android:visibility="gone">
+
+                    <!-- Explore -->
+                    <LinearLayout
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:gravity="center"
+                        android:orientation="vertical">
+
+                        <ImageButton
+                            android:id="@+id/btnExploreAdmin"
+                            android:layout_width="74dp"
+                            android:layout_height="74dp"
+                            android:background="@drawable/rounded_yellow_bg"
+                            android:padding="18dp"
+                            android:src="@android:drawable/ic_menu_search"
+                            android:contentDescription="Explore"
+                            app:tint="#2D2321" />
+
                         <TextView
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:text="Explore"
                             android:textColor="#2D2321"
                             android:textStyle="bold"
-                            android:layout_marginTop="8dp" />
+                            android:layout_marginTop="10dp" />
                     </LinearLayout>
 
+                    <!-- Create -->
                     <LinearLayout
                         android:layout_width="0dp"
                         android:layout_height="wrap_content"
                         android:layout_weight="1"
                         android:gravity="center"
                         android:orientation="vertical">
+
                         <ImageButton
-                            android:id="@+id/btnCreate"
-                            android:layout_width="65dp"
-                            android:layout_height="65dp"
+                            android:id="@+id/btnCreateAdmin"
+                            android:layout_width="74dp"
+                            android:layout_height="74dp"
                             android:background="@drawable/rounded_yellow_bg"
+                            android:padding="18dp"
                             android:src="@android:drawable/ic_menu_edit"
-                            app:tint="#2D2321"
-                            android:padding="14dp"
-                            android:contentDescription="Create Button" />
+                            android:contentDescription="Create"
+                            app:tint="#2D2321" />
+
                         <TextView
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:text="Create"
                             android:textColor="#2D2321"
                             android:textStyle="bold"
-                            android:layout_marginTop="8dp" />
+                            android:layout_marginTop="10dp" />
                     </LinearLayout>
 
+                    <!-- Admin -->
                     <LinearLayout
-                        android:id="@+id/layoutAdmin"
                         android:layout_width="0dp"
                         android:layout_height="wrap_content"
                         android:layout_weight="1"
                         android:gravity="center"
-                        android:orientation="vertical"
-                        android:visibility="gone">
+                        android:orientation="vertical">
+
                         <ImageButton
                             android:id="@+id/btnAdmin"
-                            android:layout_width="65dp"
-                            android:layout_height="65dp"
+                            android:layout_width="74dp"
+                            android:layout_height="74dp"
                             android:background="@drawable/rounded_yellow_bg"
+                            android:padding="18dp"
                             android:src="@android:drawable/ic_lock_idle_lock"
-                            app:tint="#2D2321"
-                            android:padding="14dp"
-                            android:contentDescription="Admin Button" />
+                            android:contentDescription="Admin"
+                            app:tint="#2D2321" />
+
                         <TextView
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:text="Admin"
                             android:textColor="#2D2321"
                             android:textStyle="bold"
-                            android:layout_marginTop="8dp" />
+                            android:layout_marginTop="10dp" />
                     </LinearLayout>
                 </LinearLayout>
+
+                <!-- Recommended -->
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="30dp"
+                    android:text="Recommended for you"
+                    android:textColor="#7A5901"
+                    android:textSize="13sp"
+                    android:textStyle="bold" />
 
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_marginTop="32dp"
+                    android:layout_marginTop="10dp"
                     android:background="@drawable/rounded_yellow_bg"
-                    android:padding="14dp"
-                    android:gravity="center_vertical">
+                    android:gravity="center_vertical"
+                    android:paddingHorizontal="16dp"
+                    android:paddingVertical="14dp">
+
                     <ImageView
                         android:layout_width="22dp"
                         android:layout_height="22dp"
-                        android:src="@android:drawable/ic_dialog_map"
-                        app:tint="#7A5901"
-                        android:contentDescription="Map Icon" />
-                    <TextView
-                        android:id="@+id/tvQuickInfo"
-                        android:layout_width="wrap_content"
+                        android:src="@drawable/ic_location_pin"
+                        android:contentDescription="@null"
+                        app:tint="#5D4300" />
+
+                    <LinearLayout
+                        android:layout_width="0dp"
                         android:layout_height="wrap_content"
+                        android:layout_weight="1"
                         android:layout_marginStart="12dp"
-                        android:text="Locating current tours..."
-                        android:textColor="#7A5901"
-                        android:textSize="14sp"
-                        android:fontFamily="sans-serif-medium" />
+                        android:orientation="vertical">
+
+                        <TextView
+                            android:id="@+id/tvQuickInfo"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="Explore tours near you"
+                            android:textColor="#5D4300"
+                            android:textStyle="bold"
+                            android:textSize="16sp" />
+
+                        <TextView
+                            android:id="@+id/tvQuickInfoSub"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="2dp"
+                            android:text="Based on your current location"
+                            android:textColor="#7A5901"
+                            android:textSize="12sp" />
+                    </LinearLayout>
                 </LinearLayout>
 
             </LinearLayout>
         </com.google.android.material.card.MaterialCardView>
     </LinearLayout>
 
+    <!-- Bottom nav -->
     <com.google.android.material.bottomnavigation.BottomNavigationView
         android:id="@+id/bottom_navigation"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_alignParentBottom="true"
         android:background="#FFFFFF"
-        app:itemIconTint="#2D2321"
-        app:itemTextColor="#2D2321"
+        app:itemIconTint="@color/bottom_nav_item_colors"
+        app:itemTextColor="@color/bottom_nav_item_colors"
         app:menu="@menu/bottom_nav_menu" />
 
 </RelativeLayout>

@@ -39,11 +39,10 @@ fun DocumentSnapshot.toTourSafe(): Tour {
         likesCount = (getLong("likesCount") ?: 0L).toInt(),
         status = getString("status") ?: "pending",
         imageUrl = getString("imageUrl") ?: "",
-        city = getString("city") ?: "Tel Aviv",
+        city = getString("city") ?: "tel aviv",
         stations = stationsList,
-
-        // ✅ חדש
         startLatitude = getDouble("startLatitude") ?: 0.0,
-        startLongitude = getDouble("startLongitude") ?: 0.0
+        startLongitude = getDouble("startLongitude") ?: 0.0,
+        createdBy = getString("createdBy") ?: ""
     )
 }

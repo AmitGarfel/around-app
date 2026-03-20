@@ -14,10 +14,9 @@ data class Tour(
     val imageUrl: String = "",
     val city: String = "Tel Aviv",
     val stations: List<Station> = emptyList(),
-
-    // ✅ חדש: נקודת התחלה של המסלול
     val startLatitude: Double = 0.0,
     val startLongitude: Double = 0.0,
+    val createdBy: String = "",
 
     @get:Exclude
     var isLikedByMe: Boolean = false

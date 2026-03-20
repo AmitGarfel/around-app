@@ -1,5 +1,20 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
+
+    <!-- Base -->
     <color name="black">#FF000000</color>
     <color name="white">#FFFFFFFF</color>
+
+    <!-- Brand -->
+    <color name="brand_yellow">#FFC107</color>
+    <color name="brand_dark">#2D2321</color>
+
+    <!-- Accent -->
+    <color name="brand_gold">#C89B12</color>
+    <color name="brand_brown">#5D4300</color>
+
+    <!-- Text -->
+    <color name="text_primary">#2D2321</color>
+    <color name="text_secondary">#6B6B6B</color>
+
 </resources>
