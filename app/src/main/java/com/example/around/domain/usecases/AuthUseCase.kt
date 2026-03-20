@@ -8,20 +8,24 @@ class AuthUseCase(
     private val usersRepo: UsersRepository
 ) {
     fun register(
+        firstName: String,
+        lastName: String,
         email: String,
         password: String,
         onSuccess: () -> Unit,
         onError: (Exception) -> Unit
     ) {
-        authRepo.register(email, password,
+        authRepo.register(
+            email = email,
+            password = password,
             onSuccess = { uid ->
-                // אחרי הרשמה, שמירת פרופיל משתמש ב-Firestore
                 usersRepo.createUser(
                     uid = uid,
                     email = email,
+                    firstName = firstName,
+                    lastName = lastName,
                     onSuccess = onSuccess,
-                    onError = { e ->
-                        // גם אם שמירה נכשלה, עדיין אפשר להמשיך לאפליקציה
+                    onError = {
                         onSuccess()
                     }
                 )
@@ -40,4 +44,18 @@ class AuthUseCase(
     }
 
     fun isLoggedIn(): Boolean = authRepo.currentUserId() != null
+
+    fun currentUserId(): String? = authRepo.currentUserId()
+
+    fun getCurrentUserFirstName(
+        onResult: (String?) -> Unit
+    ) {
+        val uid = authRepo.currentUserId()
+        if (uid == null) {
+            onResult(null)
+            return
+        }
+
+        usersRepo.getUserFirstName(uid, onResult)
+    }
 }

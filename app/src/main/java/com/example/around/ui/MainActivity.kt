@@ -15,6 +15,8 @@ class MainActivity : AppCompatActivity() {
 
     private val authUseCase = AppGraph.authUseCase
 
+    private lateinit var firstNameInput: EditText
+    private lateinit var lastNameInput: EditText
     private lateinit var emailInput: EditText
     private lateinit var passwordInput: EditText
     private lateinit var confirmPasswordInput: EditText
@@ -36,6 +38,8 @@ class MainActivity : AppCompatActivity() {
 
         setContentView(R.layout.activity_main)
 
+        firstNameInput = findViewById(R.id.firstNameInput)
+        lastNameInput = findViewById(R.id.lastNameInput)
         emailInput = findViewById(R.id.emailInput)
         passwordInput = findViewById(R.id.passwordInput)
         confirmPasswordInput = findViewById(R.id.confirmPasswordInput)
@@ -66,13 +70,21 @@ class MainActivity : AppCompatActivity() {
             titleText.text = "Welcome back"
             subtitleText.text = "Log in to continue exploring routes around you"
             actionButton.text = "Login"
+
+            firstNameInput.visibility = View.GONE
+            lastNameInput.visibility = View.GONE
             confirmPasswordInput.visibility = View.GONE
+
             switchModeText.text = "Don’t have an account? Sign up"
         } else {
             titleText.text = "Create account"
             subtitleText.text = "Sign up and start building your own tours"
             actionButton.text = "Create Account"
+
+            firstNameInput.visibility = View.VISIBLE
+            lastNameInput.visibility = View.VISIBLE
             confirmPasswordInput.visibility = View.VISIBLE
+
             switchModeText.text = "Already have an account? Login"
         }
     }
@@ -100,11 +112,13 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun register() {
+        val firstName = firstNameInput.text.toString().trim()
+        val lastName = lastNameInput.text.toString().trim()
         val email = emailInput.text.toString().trim()
         val password = passwordInput.text.toString().trim()
         val confirmPassword = confirmPasswordInput.text.toString().trim()
 
-        if (email.isEmpty() || password.isEmpty() || confirmPassword.isEmpty()) {
+        if (firstName.isEmpty() || lastName.isEmpty() || email.isEmpty() || password.isEmpty() || confirmPassword.isEmpty()) {
             Toast.makeText(this, "Please fill in all fields", Toast.LENGTH_SHORT).show()
             return
         }
@@ -120,6 +134,8 @@ class MainActivity : AppCompatActivity() {
         }
 
         authUseCase.register(
+            firstName = firstName,
+            lastName = lastName,
             email = email,
             password = password,
             onSuccess = {

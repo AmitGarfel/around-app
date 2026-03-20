@@ -2,7 +2,8 @@
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
-    android:layout_height="match_parent">
+    android:layout_height="match_parent"
+    android:layoutDirection="ltr">
 
     <!-- Background -->
     <ImageView
@@ -27,7 +28,8 @@
         android:orientation="vertical"
         android:gravity="center_horizontal"
         android:animateLayoutChanges="true"
-        android:paddingHorizontal="20dp">
+        android:paddingHorizontal="20dp"
+        android:layoutDirection="ltr">
 
         <!-- Logo -->
         <TextView
@@ -41,7 +43,9 @@
             android:textStyle="bold"
             android:background="@drawable/rounded_yellow_bg"
             android:paddingHorizontal="34dp"
-            android:paddingVertical="12dp" />
+            android:paddingVertical="12dp"
+            android:layoutDirection="ltr"
+            android:textDirection="ltr" />
 
         <!-- Subtitle -->
         <TextView
@@ -51,7 +55,9 @@
             android:text="Start your next city experience"
             android:textColor="#FFFFFF"
             android:textSize="15sp"
-            android:alpha="0.85" />
+            android:alpha="0.85"
+            android:layoutDirection="ltr"
+            android:textDirection="ltr" />
 
         <TextView
             android:layout_width="wrap_content"
@@ -60,7 +66,9 @@
             android:textColor="#FFFFFF"
             android:textSize="30sp"
             android:textStyle="bold"
-            android:layout_marginTop="8dp" />
+            android:layout_marginTop="8dp"
+            android:layoutDirection="ltr"
+            android:textDirection="ltr" />
 
         <!-- Card -->
         <com.google.android.material.card.MaterialCardView
@@ -76,7 +84,8 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:orientation="vertical"
-                android:padding="24dp">
+                android:padding="24dp"
+                android:layoutDirection="ltr">
 
                 <!-- Regular user -->
                 <LinearLayout
@@ -241,26 +250,33 @@
 
                 <!-- Recommended -->
                 <TextView
-                    android:layout_width="wrap_content"
+                    android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="30dp"
                     android:text="Recommended for you"
                     android:textColor="#7A5901"
                     android:textSize="13sp"
-                    android:textStyle="bold" />
+                    android:textStyle="bold"
+                    android:gravity="left"
+                    android:textAlignment="gravity"
+                    android:layoutDirection="ltr"
+                    android:textDirection="ltr" />
 
+                <!-- Recommendation -->
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="10dp"
                     android:background="@drawable/rounded_yellow_bg"
                     android:gravity="center_vertical"
-                    android:paddingHorizontal="16dp"
-                    android:paddingVertical="14dp">
+                    android:orientation="horizontal"
+                    android:paddingHorizontal="12dp"
+                    android:paddingVertical="14dp"
+                    android:layoutDirection="ltr">
 
                     <ImageView
-                        android:layout_width="22dp"
-                        android:layout_height="22dp"
+                        android:layout_width="20dp"
+                        android:layout_height="20dp"
                         android:src="@drawable/ic_location_pin"
                         android:contentDescription="@null"
                         app:tint="#5D4300" />
@@ -269,26 +285,40 @@
                         android:layout_width="0dp"
                         android:layout_height="wrap_content"
                         android:layout_weight="1"
-                        android:layout_marginStart="12dp"
-                        android:orientation="vertical">
+                        android:layout_marginStart="10dp"
+                        android:orientation="vertical"
+                        android:layoutDirection="ltr">
 
                         <TextView
                             android:id="@+id/tvQuickInfo"
-                            android:layout_width="wrap_content"
+                            android:layout_width="match_parent"
                             android:layout_height="wrap_content"
-                            android:text="Explore tours near you"
+                            android:text="Near you: Hod Hasharon Tours"
                             android:textColor="#5D4300"
                             android:textStyle="bold"
-                            android:textSize="16sp" />
+                            android:textSize="15sp"
+                            android:maxLines="1"
+                            android:gravity="left"
+                            android:textAlignment="gravity"
+                            android:layoutDirection="ltr"
+                            android:textDirection="ltr"
+                            android:autoSizeTextType="uniform"
+                            android:autoSizeMinTextSize="11sp"
+                            android:autoSizeMaxTextSize="15sp"
+                            android:autoSizeStepGranularity="1sp" />
 
                         <TextView
                             android:id="@+id/tvQuickInfoSub"
-                            android:layout_width="wrap_content"
+                            android:layout_width="match_parent"
                             android:layout_height="wrap_content"
                             android:layout_marginTop="2dp"
                             android:text="Based on your current location"
-                            android:textColor="#7A5901"
-                            android:textSize="12sp" />
+                            android:textColor="#555555"
+                            android:textSize="14sp"
+                            android:gravity="left"
+                            android:textAlignment="gravity"
+                            android:layoutDirection="ltr"
+                            android:textDirection="ltr" />
                     </LinearLayout>
                 </LinearLayout>
 

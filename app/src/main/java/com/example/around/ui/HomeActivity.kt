@@ -9,6 +9,7 @@ import android.widget.LinearLayout
 import android.widget.Spinner
 import android.widget.TextView
 import com.example.around.R
+import com.example.around.di.AppGraph
 import com.example.around.ui.base.BaseActivity
 import java.util.Calendar
 
@@ -28,21 +29,9 @@ class HomeActivity : BaseActivity() {
 
         detectedCity = canonicalCity(intent.getStringExtra("CITY") ?: "Tel Aviv")
 
-        val userName = "Amit"
         val autoTimeContext = getAutomaticTimeContext()
 
-        val emoji = when (autoTimeContext) {
-            "Morning" -> "☀️"
-            "Afternoon" -> "🌤️"
-            else -> "🌙"
-        }
-
-        greetingTv.text = when (autoTimeContext) {
-            "Morning" -> "Good morning, $userName $emoji"
-            "Afternoon" -> "Good afternoon, $userName $emoji"
-            else -> "Good evening, $userName $emoji"
-        }
-
+        setupGreeting(greetingTv, autoTimeContext)
         setupGridAnimation()
         setSpinnerToAutoTime(timeSpinner, autoTimeContext)
         setupCitySpinner(citySpinner)
@@ -55,6 +44,26 @@ class HomeActivity : BaseActivity() {
         if (!isUserLoggedIn()) {
             startActivity(Intent(this, MainActivity::class.java))
             finish()
+        }
+    }
+
+    private fun setupGreeting(greetingTv: TextView, autoTimeContext: String) {
+        val emoji = when (autoTimeContext) {
+            "Morning" -> "☀️"
+            "Afternoon" -> "🌤️"
+            else -> "🌙"
+        }
+
+        AppGraph.authUseCase.getCurrentUserFirstName { firstName ->
+            runOnUiThread {
+                val safeName = if (firstName.isNullOrBlank()) "there" else firstName
+
+                greetingTv.text = when (autoTimeContext) {
+                    "Morning" -> "Good morning, $safeName $emoji"
+                    "Afternoon" -> "Good afternoon, $safeName $emoji"
+                    else -> "Good evening, $safeName $emoji"
+                }
+            }
         }
     }
 

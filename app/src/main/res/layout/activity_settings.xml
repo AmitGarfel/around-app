@@ -9,9 +9,9 @@
         android:id="@+id/ivBackground"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:src="@drawable/city_bg"
+        android:contentDescription="@null"
         android:scaleType="centerCrop"
-        android:contentDescription="@null" />
+        android:src="@drawable/city_bg" />
 
     <View
         android:layout_width="match_parent"
@@ -24,9 +24,9 @@
         android:layout_height="wrap_content"
         android:layout_centerInParent="true"
         android:layout_margin="24dp"
+        app:cardBackgroundColor="#FFFFFF"
         app:cardCornerRadius="24dp"
-        app:cardElevation="8dp"
-        app:cardBackgroundColor="#FFFFFF">
+        app:cardElevation="8dp">
 
         <LinearLayout
             android:layout_width="match_parent"
@@ -39,17 +39,53 @@
                 android:layout_height="wrap_content"
                 android:text="Account"
                 android:textColor="#2D2321"
-                android:textStyle="bold"
-                android:textSize="24sp" />
+                android:textSize="24sp"
+                android:textStyle="bold" />
 
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="You are currently signed in with:"
-                android:textColor="#666666"
-                android:textSize="14sp"
                 android:layout_marginTop="8dp"
-                android:layout_marginBottom="22dp" />
+                android:layout_marginBottom="22dp"
+                android:text="Your account details"
+                android:textColor="#666666"
+                android:textSize="14sp" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="First Name"
+                android:textColor="#888888"
+                android:textSize="13sp" />
+
+            <TextView
+                android:id="@+id/tvFirstName"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="6dp"
+                android:layout_marginBottom="18dp"
+                android:text="—"
+                android:textColor="#000000"
+                android:textSize="17sp"
+                android:textStyle="bold" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Last Name"
+                android:textColor="#888888"
+                android:textSize="13sp" />
+
+            <TextView
+                android:id="@+id/tvLastName"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="6dp"
+                android:layout_marginBottom="18dp"
+                android:text="—"
+                android:textColor="#000000"
+                android:textSize="17sp"
+                android:textStyle="bold" />
 
             <TextView
                 android:layout_width="wrap_content"
@@ -62,21 +98,21 @@
                 android:id="@+id/tvEmail"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:layout_marginTop="6dp"
                 android:text="—"
                 android:textColor="#000000"
-                android:textStyle="bold"
                 android:textSize="17sp"
-                android:layout_marginTop="6dp" />
+                android:textStyle="bold" />
 
             <Button
                 android:id="@+id/btnLogout"
                 android:layout_width="match_parent"
                 android:layout_height="56dp"
                 android:layout_marginTop="28dp"
+                android:backgroundTint="#FFC107"
                 android:text="Logout"
-                android:textStyle="bold"
                 android:textColor="#2D2321"
-                android:backgroundTint="#FFC107" />
+                android:textStyle="bold" />
         </LinearLayout>
     </com.google.android.material.card.MaterialCardView>
 
@@ -85,7 +121,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_alignParentBottom="true"
-        app:menu="@menu/bottom_nav_menu"
         app:itemIconTint="@color/black"
-        app:itemTextColor="@color/black" />
+        app:itemTextColor="@color/black"
+        app:menu="@menu/bottom_nav_menu" />
 </RelativeLayout>
