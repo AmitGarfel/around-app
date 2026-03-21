@@ -2,6 +2,7 @@ package com.example.around.data.mappers
 
 import com.example.around.domain.model.Station
 import com.example.around.domain.model.Tour
+import com.example.around.util.CityNormalizer
 import com.google.firebase.firestore.DocumentSnapshot
 
 private fun mapToStation(m: Map<*, *>): Station {
@@ -39,7 +40,7 @@ fun DocumentSnapshot.toTourSafe(): Tour {
         likesCount = (getLong("likesCount") ?: 0L).toInt(),
         status = getString("status") ?: "pending",
         imageUrl = getString("imageUrl") ?: "",
-        city = getString("city") ?: "tel aviv",
+        city = CityNormalizer.canonical(getString("city") ?: "Tel Aviv"),
         stations = stationsList,
         startLatitude = getDouble("startLatitude") ?: 0.0,
         startLongitude = getDouble("startLongitude") ?: 0.0,

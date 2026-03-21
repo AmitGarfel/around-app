@@ -17,6 +17,7 @@ import com.example.around.data.geo.LocationHelper
 import com.example.around.di.AppGraph
 import com.example.around.domain.model.Tour
 import com.example.around.ui.base.BaseActivity
+import com.example.around.util.NavigationKeys
 
 class TourListActivity : BaseActivity() {
 
@@ -38,9 +39,9 @@ class TourListActivity : BaseActivity() {
 
         setupBackButton()
 
-        mood = intent.getStringExtra("MOOD") ?: "culinary"
-        time = intent.getStringExtra("TIME") ?: "Evening"
-        selectedCity = intent.getStringExtra("CITY") ?: "Tel Aviv"
+        mood = intent.getStringExtra(NavigationKeys.EXTRA_MOOD) ?: "culinary"
+        time = intent.getStringExtra(NavigationKeys.EXTRA_TIME) ?: "Evening"
+        selectedCity = intent.getStringExtra(NavigationKeys.EXTRA_CITY) ?: "Tel Aviv"
 
         recyclerView = findViewById(R.id.toursRecyclerView)
         emptyStateLayout = findViewById(R.id.emptyStateLayout)
@@ -48,8 +49,10 @@ class TourListActivity : BaseActivity() {
 
         recyclerView.layoutManager = LinearLayoutManager(this)
 
-        findViewById<TextView>(R.id.listTitle).text = mood.replaceFirstChar { it.uppercase() } + " routes"
-        findViewById<TextView>(R.id.listSubtitle).text = "Perfect for $time in $selectedCity ✨"
+        findViewById<TextView>(R.id.listTitle).text =
+            mood.replaceFirstChar { it.uppercase() } + " routes"
+        findViewById<TextView>(R.id.listSubtitle).text =
+            "Perfect for $time in $selectedCity ✨"
 
         fetchTours()
     }

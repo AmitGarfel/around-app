@@ -11,6 +11,8 @@ import android.widget.TextView
 import com.example.around.R
 import com.example.around.di.AppGraph
 import com.example.around.ui.base.BaseActivity
+import com.example.around.util.CityNormalizer
+import com.example.around.util.NavigationKeys
 import java.util.Calendar
 
 class HomeActivity : BaseActivity() {
@@ -27,7 +29,9 @@ class HomeActivity : BaseActivity() {
         val timeSpinner = findViewById<Spinner>(R.id.spinnerTimeOverride)
         val citySpinner = findViewById<Spinner>(R.id.spinnerCityOverride)
 
-        detectedCity = canonicalCity(intent.getStringExtra("CITY") ?: "Tel Aviv")
+        detectedCity = CityNormalizer.canonical(
+            intent.getStringExtra(NavigationKeys.EXTRA_CITY) ?: "Tel Aviv"
+        )
 
         val autoTimeContext = getAutomaticTimeContext()
 
@@ -95,7 +99,7 @@ class HomeActivity : BaseActivity() {
 
     private fun setupCitySpinner(citySpinner: Spinner) {
         val baseCities = resources.getStringArray(R.array.cities_options)
-            .map { canonicalCity(it) }
+            .map { CityNormalizer.canonical(it) }
             .distinct()
             .filter { it.isNotBlank() }
             .filterNot { it.equals(detectedCity, ignoreCase = true) }
@@ -125,7 +129,7 @@ class HomeActivity : BaseActivity() {
             return if (selected.startsWith("Near me", ignoreCase = true) || selected.isBlank()) {
                 detectedCity
             } else {
-                canonicalCity(selected)
+                CityNormalizer.canonical(selected)
             }
         }
 
@@ -148,19 +152,9 @@ class HomeActivity : BaseActivity() {
 
     private fun openTourList(mood: String, time: String, city: String) {
         val intent = Intent(this, TourListActivity::class.java)
-        intent.putExtra("MOOD", mood)
-        intent.putExtra("TIME", time)
-        intent.putExtra("CITY", canonicalCity(city))
+        intent.putExtra(NavigationKeys.EXTRA_MOOD, mood)
+        intent.putExtra(NavigationKeys.EXTRA_TIME, time)
+        intent.putExtra(NavigationKeys.EXTRA_CITY, CityNormalizer.canonical(city))
         startActivity(intent)
-    }
-
-    private fun canonicalCity(city: String): String {
-        return when (city.trim().lowercase()) {
-            "hod hasharon", "hod-ha-sharon", "hod ha sharon" -> "Hod Hasharon"
-            "tel aviv", "tel-aviv" -> "Tel Aviv"
-            "petah tikva", "petah-tikva" -> "Petah Tikva"
-            "rishon lezion", "rishon le zion", "rishon-lezion" -> "Rishon LeZion"
-            else -> city.trim()
-        }
     }
 }

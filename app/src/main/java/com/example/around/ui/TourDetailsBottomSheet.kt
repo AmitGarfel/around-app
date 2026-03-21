@@ -13,6 +13,7 @@ import android.widget.TextView
 import com.bumptech.glide.Glide
 import com.example.around.R
 import com.example.around.domain.model.Tour
+import com.example.around.util.NavigationKeys
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 
 class TourDetailsBottomSheet : BottomSheetDialogFragment() {
@@ -33,7 +34,6 @@ class TourDetailsBottomSheet : BottomSheetDialogFragment() {
         v.findViewById<TextView>(R.id.tvTourDetailName).text = name
         v.findViewById<TextView>(R.id.tvTourDetailDesc).text = desc
 
-        // ✅ Stations inside blue box - FORCE LEFT even in RTL
         val stationsContainer = v.findViewById<LinearLayout>(R.id.llStationsContainer)
         stationsContainer.removeAllViews()
         stationsContainer.layoutDirection = View.LAYOUT_DIRECTION_LTR
@@ -68,7 +68,7 @@ class TourDetailsBottomSheet : BottomSheetDialogFragment() {
             }
 
             val intent = Intent(requireContext(), TourStationsActivity::class.java)
-            intent.putExtra(TourStationsActivity.EXTRA_TOUR_ID, tourId)
+            intent.putExtra(NavigationKeys.EXTRA_TOUR_ID, tourId)
             startActivity(intent)
             dismiss()
         }
@@ -96,7 +96,6 @@ class TourDetailsBottomSheet : BottomSheetDialogFragment() {
         }
     }
 
-    // ✅ Row: [📍] [Station Name] - pin always on LEFT
     private fun makeStationRow(stationName: String): LinearLayout {
         return LinearLayout(requireContext()).apply {
             orientation = LinearLayout.HORIZONTAL
@@ -118,7 +117,6 @@ class TourDetailsBottomSheet : BottomSheetDialogFragment() {
                 layoutDirection = View.LAYOUT_DIRECTION_LTR
                 gravity = Gravity.LEFT
 
-                // fixed width -> nice alignment
                 layoutParams = LinearLayout.LayoutParams(
                     dp(22),
                     LinearLayout.LayoutParams.WRAP_CONTENT

@@ -20,6 +20,8 @@ import com.example.around.di.AppGraph
 import com.example.around.domain.model.Station
 import com.example.around.domain.model.Tour
 import com.example.around.ui.base.BaseActivity
+import com.example.around.util.CityNormalizer
+import com.example.around.util.PlaceQueryBuilder
 import com.google.android.gms.maps.model.LatLng
 import kotlinx.coroutines.launch
 
@@ -85,7 +87,10 @@ class CreateTourActivity : BaseActivity() {
     private fun setupCityAutocomplete() {
         val cityAuto = findViewById<AutoCompleteTextView>(R.id.etCity)
 
-        val cities = resources.getStringArray(R.array.cities_options).toList()
+        val cities = resources.getStringArray(R.array.cities_options)
+            .map { CityNormalizer.canonical(it) }
+            .distinct()
+
         val adapter = ArrayAdapter(
             this,
             android.R.layout.simple_dropdown_item_1line,
@@ -144,19 +149,10 @@ class CreateTourActivity : BaseActivity() {
         }
     }
 
-    private fun canonicalCity(city: String): String {
-        return when (city.trim()) {
-            "Hod HaSharon" -> "Hod Hasharon"
-            "Tel-Aviv" -> "Tel Aviv"
-            "Petah-Tikva" -> "Petah Tikva"
-            else -> city.trim()
-        }
-    }
-
     private fun saveTour() {
         val tourName = findViewById<EditText>(R.id.etTourName).text.toString().trim()
         val cityRaw = findViewById<AutoCompleteTextView>(R.id.etCity).text.toString().trim()
-        val city = canonicalCity(cityRaw)
+        val city = CityNormalizer.canonical(cityRaw)
         val description = findViewById<EditText>(R.id.etDescription).text.toString().trim()
 
         val mood = findViewById<Spinner>(R.id.spinnerMood).selectedItem.toString().trim()
@@ -186,17 +182,7 @@ class CreateTourActivity : BaseActivity() {
         val uid = AppGraph.auth.currentUser?.uid ?: ""
 
         val firstStation = stationsList.first()
-        val baseQuery = firstStation.query.trim().ifBlank { firstStation.name.trim() }
-
-        val fullQuery = if (
-            city.isNotBlank() &&
-            baseQuery.isNotBlank() &&
-            !baseQuery.contains(city, ignoreCase = true)
-        ) {
-            "$baseQuery, $city"
-        } else {
-            baseQuery
-        }
+        val fullQuery = PlaceQueryBuilder.build(firstStation, city)
 
         lifecycleScope.launch {
             try {

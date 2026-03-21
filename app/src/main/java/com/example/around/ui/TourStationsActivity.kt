@@ -20,6 +20,9 @@ import com.example.around.data.geo.MapRenderer
 import com.example.around.data.geo.MapsNavigationRepository
 import com.example.around.di.AppGraph
 import com.example.around.domain.model.Station
+import com.example.around.util.CityNormalizer
+import com.example.around.util.NavigationKeys
+import com.example.around.util.PlaceQueryBuilder
 import com.google.android.gms.maps.GoogleMap
 import com.google.android.gms.maps.OnMapReadyCallback
 import com.google.android.gms.maps.SupportMapFragment
@@ -64,7 +67,7 @@ class TourStationsActivity : AppCompatActivity(), OnMapReadyCallback {
         setupBackButton()
         setupMapTouchInScroll()
 
-        val incomingId = intent.getStringExtra(EXTRA_TOUR_ID)
+        val incomingId = intent.getStringExtra(NavigationKeys.EXTRA_TOUR_ID)
         if (incomingId.isNullOrBlank()) {
             Toast.makeText(this, "Missing tour id", Toast.LENGTH_SHORT).show()
             finish()
@@ -173,7 +176,7 @@ class TourStationsActivity : AppCompatActivity(), OnMapReadyCallback {
             tourId = tourId,
             onSuccess = { tour ->
                 tourName = tour.name
-                tourCity = tour.city
+                tourCity = CityNormalizer.canonical(tour.city)
                 stations = tour.stations
 
                 resolvedPositions = MutableList(stations.size) { null }
@@ -230,29 +233,13 @@ class TourStationsActivity : AppCompatActivity(), OnMapReadyCallback {
     }
 
     private suspend fun geocodeStation(station: Station): LatLng? {
-        val base = station.query.trim().ifBlank { station.name.trim() }
-        if (base.isBlank()) return null
-
-        val city = tourCity.trim()
-        val queryText =
-            if (city.isNotBlank() && !base.contains(city, ignoreCase = true)) {
-                "$base, $city"
-            } else {
-                base
-            }
-
+        val queryText = PlaceQueryBuilder.build(station, tourCity)
+        if (queryText.isBlank()) return null
         return geocodingRepo.geocode(queryText)
     }
 
     private fun navigateToStationByName(station: Station) {
-        val base = station.query.trim().ifBlank { station.name.trim() }
-        val city = tourCity.trim()
-
-        val searchText = when {
-            base.isBlank() -> ""
-            city.isNotBlank() && !base.contains(city, ignoreCase = true) -> "$base, $city"
-            else -> base
-        }
+        val searchText = PlaceQueryBuilder.build(station, tourCity)
 
         if (searchText.isBlank()) {
             Toast.makeText(this, "Destination not found", Toast.LENGTH_SHORT).show()
@@ -268,17 +255,7 @@ class TourStationsActivity : AppCompatActivity(), OnMapReadyCallback {
             return
         }
 
-        val city = tourCity.trim()
-
-        val points = stations.mapNotNull { station ->
-            val base = station.query.trim().ifBlank { station.name.trim() }
-            if (base.isBlank()) return@mapNotNull null
-            if (city.isNotBlank() && !base.contains(city, ignoreCase = true)) {
-                "$base, $city"
-            } else {
-                base
-            }
-        }
+        val points = PlaceQueryBuilder.buildAll(stations, tourCity)
 
         if (points.size < 2) {
             Toast.makeText(this, "Couldn't build route points", Toast.LENGTH_SHORT).show()
@@ -287,9 +264,5 @@ class TourStationsActivity : AppCompatActivity(), OnMapReadyCallback {
 
         Log.d("NAV_NAMES", "mode=$selectedTravelModeDir points=$points")
         navRepo.navigateRouteByNames(points, selectedTravelModeDir)
-    }
-
-    companion object {
-        const val EXTRA_TOUR_ID = "EXTRA_TOUR_ID"
     }
 }

@@ -14,6 +14,7 @@ import com.example.around.R
 import com.example.around.data.geo.LocationHelper
 import com.example.around.di.AppGraph
 import com.example.around.ui.base.BaseActivity
+import com.example.around.util.NavigationKeys
 
 class MenuActivity : BaseActivity() {
 
@@ -90,7 +91,7 @@ class MenuActivity : BaseActivity() {
 
     private fun openExplore() {
         val intent = Intent(this, HomeActivity::class.java)
-        intent.putExtra("CITY", detectedCity)
+        intent.putExtra(NavigationKeys.EXTRA_CITY, detectedCity)
         startActivity(intent)
     }
 
