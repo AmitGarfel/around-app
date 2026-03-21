@@ -4,10 +4,10 @@ import android.Manifest
 import android.content.pm.PackageManager
 import android.os.Bundle
 import android.view.View
+import android.widget.ImageButton
 import android.widget.LinearLayout
 import android.widget.TextView
 import android.widget.Toast
-import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
@@ -16,8 +16,9 @@ import com.example.around.data.geo.LocationDistanceUtils
 import com.example.around.data.geo.LocationHelper
 import com.example.around.di.AppGraph
 import com.example.around.domain.model.Tour
+import com.example.around.ui.base.BaseActivity
 
-class TourListActivity : AppCompatActivity() {
+class TourListActivity : BaseActivity() {
 
     private val loadToursUseCase = AppGraph.loadToursWithLikesUseCase
     private val likesRepo = AppGraph.likesRepo
@@ -35,6 +36,8 @@ class TourListActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_tour_list)
 
+        setupBackButton()
+
         mood = intent.getStringExtra("MOOD") ?: "culinary"
         time = intent.getStringExtra("TIME") ?: "Evening"
         selectedCity = intent.getStringExtra("CITY") ?: "Tel Aviv"
@@ -45,10 +48,16 @@ class TourListActivity : AppCompatActivity() {
 
         recyclerView.layoutManager = LinearLayoutManager(this)
 
-        findViewById<TextView>(R.id.listTitle).text = "$mood routes"
+        findViewById<TextView>(R.id.listTitle).text = mood.replaceFirstChar { it.uppercase() } + " routes"
         findViewById<TextView>(R.id.listSubtitle).text = "Perfect for $time in $selectedCity ✨"
 
         fetchTours()
+    }
+
+    private fun setupBackButton() {
+        findViewById<ImageButton>(R.id.btnBack).setOnClickListener {
+            finish()
+        }
     }
 
     private fun fetchTours() {

@@ -13,17 +13,17 @@ import android.widget.ImageView
 import android.widget.Spinner
 import android.widget.Toast
 import androidx.activity.result.contract.ActivityResultContracts
-import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.lifecycleScope
 import com.example.around.R
 import com.example.around.data.geo.GeocodingRepository
 import com.example.around.di.AppGraph
 import com.example.around.domain.model.Station
 import com.example.around.domain.model.Tour
+import com.example.around.ui.base.BaseActivity
 import com.google.android.gms.maps.model.LatLng
 import kotlinx.coroutines.launch
 
-class CreateTourActivity : AppCompatActivity() {
+class CreateTourActivity : BaseActivity() {
 
     private val createTourUseCase = AppGraph.createTourUseCase
     private lateinit var geocodingRepo: GeocodingRepository
@@ -37,13 +37,15 @@ class CreateTourActivity : AppCompatActivity() {
                 val preview = findViewById<ImageView>(R.id.ivPreview)
                 preview.visibility = ImageView.VISIBLE
                 preview.setImageURI(uri)
-                Toast.makeText(this, "תמונה נבחרה ✅", Toast.LENGTH_SHORT).show()
+                Toast.makeText(this, "Image selected successfully ✅", Toast.LENGTH_SHORT).show()
             }
         }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_create_tour)
+
+        setupBottomNav(R.id.nav_settings)
 
         geocodingRepo = AppGraph.geocodingRepo(this)
 
@@ -172,12 +174,12 @@ class CreateTourActivity : AppCompatActivity() {
             .map { Station(name = it, query = it) }
 
         if (tourName.isEmpty() || city.isEmpty()) {
-            Toast.makeText(this, "עמיתוש, חייב למלא שם ועיר!", Toast.LENGTH_SHORT).show()
+            Toast.makeText(this, "Please enter both tour name and city", Toast.LENGTH_SHORT).show()
             return
         }
 
-        if (stationsList.isEmpty()) {
-            Toast.makeText(this, "צריך לפחות תחנה אחת", Toast.LENGTH_SHORT).show()
+        if (stationsList.size < 2) {
+            Toast.makeText(this, "Please add at least 2 stations", Toast.LENGTH_SHORT).show()
             return
         }
 
@@ -224,7 +226,7 @@ class CreateTourActivity : AppCompatActivity() {
                 if (imageUri != null) {
                     Toast.makeText(
                         this@CreateTourActivity,
-                        "מעלה תמונה... ⏫",
+                        "Uploading image... ⏫",
                         Toast.LENGTH_SHORT
                     ).show()
                 }
@@ -235,7 +237,7 @@ class CreateTourActivity : AppCompatActivity() {
                     onSuccess = {
                         Toast.makeText(
                             this@CreateTourActivity,
-                            "המסלול נשלח לאישור המערכת!",
+                            "Your tour has been submitted for approval!",
                             Toast.LENGTH_LONG
                         ).show()
                         finish()
@@ -244,7 +246,7 @@ class CreateTourActivity : AppCompatActivity() {
                         Log.e("CREATE_TOUR", "Create failed", e)
                         Toast.makeText(
                             this@CreateTourActivity,
-                            "שגיאה בשמירה: ${e.localizedMessage}",
+                            "Error while saving: ${e.localizedMessage}",
                             Toast.LENGTH_LONG
                         ).show()
                     }
@@ -274,7 +276,7 @@ class CreateTourActivity : AppCompatActivity() {
                     onSuccess = {
                         Toast.makeText(
                             this@CreateTourActivity,
-                            "המסלול נשלח לאישור המערכת!",
+                            "Your tour has been submitted for approval!",
                             Toast.LENGTH_LONG
                         ).show()
                         finish()
@@ -283,7 +285,7 @@ class CreateTourActivity : AppCompatActivity() {
                         Log.e("CREATE_TOUR", "Create failed", err)
                         Toast.makeText(
                             this@CreateTourActivity,
-                            "שגיאה בשמירה: ${err.localizedMessage}",
+                            "Error while saving: ${err.localizedMessage}",
                             Toast.LENGTH_LONG
                         ).show()
                     }

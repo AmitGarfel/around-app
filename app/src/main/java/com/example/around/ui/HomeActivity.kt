@@ -21,7 +21,7 @@ class HomeActivity : BaseActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_home)
 
-        setupBottomNav(R.id.nav_menu)
+        setupBottomNav(R.id.nav_home)
 
         val greetingTv = findViewById<TextView>(R.id.tvGreeting)
         val timeSpinner = findViewById<Spinner>(R.id.spinnerTimeOverride)

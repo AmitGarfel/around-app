@@ -280,8 +280,8 @@
         android:layout_height="wrap_content"
         android:layout_alignParentBottom="true"
         android:background="#FFFFFF"
-        app:itemIconTint="#2D2321"
-        app:itemTextColor="#2D2321"
+        app:itemIconTint="@color/bottom_nav_item_colors"
+        app:itemTextColor="@color/bottom_nav_item_colors"
         app:menu="@menu/bottom_nav_menu" />
 
 </RelativeLayout>

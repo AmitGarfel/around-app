@@ -6,6 +6,7 @@ import android.view.MotionEvent
 import android.view.View
 import android.widget.AdapterView
 import android.widget.ArrayAdapter
+import android.widget.ImageButton
 import android.widget.ScrollView
 import android.widget.Spinner
 import android.widget.TextView
@@ -34,14 +35,10 @@ class TourStationsActivity : AppCompatActivity(), OnMapReadyCallback {
 
     private lateinit var gMap: GoogleMap
 
-    // ✅ injected from AppGraph
     private val toursRepo = AppGraph.toursRepo
-
-    // ✅ context-based repos from AppGraph providers
     private lateinit var geocodingRepo: GeocodingRepository
     private lateinit var navRepo: MapsNavigationRepository
 
-    // ✅ renderer
     private var mapRenderer: MapRenderer? = null
 
     private lateinit var tourId: String
@@ -49,30 +46,24 @@ class TourStationsActivity : AppCompatActivity(), OnMapReadyCallback {
     private var tourName: String = ""
     private var tourCity: String = ""
 
-    // ✅ selected mode
-    private var selectedTravelModeDir = "driving" // driving/walking/bicycling/transit
-    private var selectedTravelModeNav = "d"       // d/w/b/r
+    private var selectedTravelModeDir = "driving"
+    private var selectedTravelModeNav = "d"
 
     private val ioScope = CoroutineScope(SupervisorJob() + Dispatchers.IO)
 
-    // Map resolved points (same size as stations)
     private var resolvedPositions: MutableList<LatLng?> = mutableListOf()
-
-    // Prevent re-starting geocode/render multiple times
     private var isResolving = false
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_tour_stations)
 
-        // ✅ init repos via AppGraph
         geocodingRepo = AppGraph.geocodingRepo(this)
         navRepo = AppGraph.mapsNavRepo(this)
 
-        // ✅ allow map gestures inside ScrollView
+        setupBackButton()
         setupMapTouchInScroll()
 
-        // ✅ get incoming tour id
         val incomingId = intent.getStringExtra(EXTRA_TOUR_ID)
         if (incomingId.isNullOrBlank()) {
             Toast.makeText(this, "Missing tour id", Toast.LENGTH_SHORT).show()
@@ -83,7 +74,6 @@ class TourStationsActivity : AppCompatActivity(), OnMapReadyCallback {
 
         setupTravelModeSpinner()
 
-        // ✅ init map
         val mapFragment = supportFragmentManager
             .findFragmentById(R.id.mapFragment) as SupportMapFragment
         mapFragment.getMapAsync(this)
@@ -99,7 +89,6 @@ class TourStationsActivity : AppCompatActivity(), OnMapReadyCallback {
     override fun onMapReady(map: GoogleMap) {
         gMap = map
 
-        // ✅ enable user gestures
         gMap.uiSettings.isZoomGesturesEnabled = true
         gMap.uiSettings.isScrollGesturesEnabled = true
         gMap.uiSettings.isRotateGesturesEnabled = true
@@ -110,11 +99,12 @@ class TourStationsActivity : AppCompatActivity(), OnMapReadyCallback {
         renderStationsOnMapIfReady()
     }
 
-    /**
-     * ✅ Key fix:
-     * The map is inside a ScrollView, so the ScrollView can steal touch events.
-     * When user touches the map area, tell ScrollView: "Don't intercept".
-     */
+    private fun setupBackButton() {
+        findViewById<ImageButton>(R.id.btnBack).setOnClickListener {
+            finish()
+        }
+    }
+
     private fun setupMapTouchInScroll() {
         val scrollView = findViewById<ScrollView>(R.id.stationsScroll)
         val mapTouchLayer = findViewById<View>(R.id.mapTouchLayer)
@@ -132,7 +122,7 @@ class TourStationsActivity : AppCompatActivity(), OnMapReadyCallback {
                     scrollView.requestDisallowInterceptTouchEvent(false)
                 }
             }
-            false // must return false so map receives touch too
+            false
         }
     }
 
@@ -146,21 +136,32 @@ class TourStationsActivity : AppCompatActivity(), OnMapReadyCallback {
         )
         adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
         spinner.adapter = adapter
-
-        spinner.setSelection(0) // Driving
+        spinner.setSelection(0)
 
         spinner.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
             override fun onItemSelected(parent: AdapterView<*>, view: View?, position: Int, id: Long) {
                 when (position) {
-                    0 -> { selectedTravelModeDir = "driving";   selectedTravelModeNav = "d" }
-                    1 -> { selectedTravelModeDir = "walking";   selectedTravelModeNav = "w" }
-                    2 -> { selectedTravelModeDir = "bicycling"; selectedTravelModeNav = "b" }
-                    3 -> { selectedTravelModeDir = "transit";   selectedTravelModeNav = "r" }
-                    else -> { selectedTravelModeDir = "driving"; selectedTravelModeNav = "d" }
+                    0 -> {
+                        selectedTravelModeDir = "driving"
+                        selectedTravelModeNav = "d"
+                    }
+                    1 -> {
+                        selectedTravelModeDir = "walking"
+                        selectedTravelModeNav = "w"
+                    }
+                    2 -> {
+                        selectedTravelModeDir = "bicycling"
+                        selectedTravelModeNav = "b"
+                    }
+                    3 -> {
+                        selectedTravelModeDir = "transit"
+                        selectedTravelModeNav = "r"
+                    }
+                    else -> {
+                        selectedTravelModeDir = "driving"
+                        selectedTravelModeNav = "d"
+                    }
                 }
-
-                // optional: re-render if you want polyline refreshed in the future
-                // renderStationsOnMapIfReady()
             }
 
             override fun onNothingSelected(parent: AdapterView<*>) = Unit
@@ -175,10 +176,11 @@ class TourStationsActivity : AppCompatActivity(), OnMapReadyCallback {
                 tourCity = tour.city
                 stations = tour.stations
 
-                // init resolvedPositions with same size
                 resolvedPositions = MutableList(stations.size) { null }
 
                 findViewById<TextView>(R.id.tvTourTitle).text = tourName
+                findViewById<TextView>(R.id.tvSubTitle).text =
+                    "Follow the stations and start exploring in $tourCity ✨"
 
                 setupStationsList(stations)
                 renderStationsOnMapIfReady()
@@ -203,18 +205,11 @@ class TourStationsActivity : AppCompatActivity(), OnMapReadyCallback {
         }
     }
 
-    /**
-     * ✅ Clean behavior:
-     * - Only renders once map+stations are ready
-     * - Resolves all points on IO thread
-     * - Renders once on Main thread
-     */
     private fun renderStationsOnMapIfReady() {
         val renderer = mapRenderer ?: return
         if (stations.isEmpty()) return
         if (isResolving) return
 
-        // ensure list size matches
         if (resolvedPositions.size != stations.size) {
             resolvedPositions = MutableList(stations.size) { null }
         }
@@ -240,7 +235,11 @@ class TourStationsActivity : AppCompatActivity(), OnMapReadyCallback {
 
         val city = tourCity.trim()
         val queryText =
-            if (city.isNotBlank() && !base.contains(city, ignoreCase = true)) "$base, $city" else base
+            if (city.isNotBlank() && !base.contains(city, ignoreCase = true)) {
+                "$base, $city"
+            } else {
+                base
+            }
 
         return geocodingRepo.geocode(queryText)
     }
@@ -271,10 +270,14 @@ class TourStationsActivity : AppCompatActivity(), OnMapReadyCallback {
 
         val city = tourCity.trim()
 
-        val points = stations.mapNotNull { st ->
-            val base = st.query.trim().ifBlank { st.name.trim() }
+        val points = stations.mapNotNull { station ->
+            val base = station.query.trim().ifBlank { station.name.trim() }
             if (base.isBlank()) return@mapNotNull null
-            if (city.isNotBlank() && !base.contains(city, ignoreCase = true)) "$base, $city" else base
+            if (city.isNotBlank() && !base.contains(city, ignoreCase = true)) {
+                "$base, $city"
+            } else {
+                base
+            }
         }
 
         if (points.size < 2) {

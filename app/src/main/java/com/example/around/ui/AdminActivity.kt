@@ -2,17 +2,15 @@ package com.example.around.ui
 
 import android.os.Bundle
 import android.widget.Toast
-import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
-import com.example.around.ui.AdminTourAdapter
-import com.example.around.di.AppGraph
 import com.example.around.R
+import com.example.around.di.AppGraph
 import com.example.around.domain.model.Tour
+import com.example.around.ui.base.BaseActivity
 
-class AdminActivity : AppCompatActivity() {
+class AdminActivity : BaseActivity() {
 
-    // ✅ במקום FirebaseFirestore בתוך ה-Activity
     private val toursRepo = AppGraph.toursRepo
 
     private lateinit var recyclerView: RecyclerView
@@ -22,6 +20,8 @@ class AdminActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_admin)
+
+        setupBottomNav(R.id.nav_menu)
 
         recyclerView = findViewById(R.id.rvPendingTours)
         recyclerView.layoutManager = LinearLayoutManager(this)
