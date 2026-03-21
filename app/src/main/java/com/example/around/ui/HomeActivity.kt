@@ -42,6 +42,11 @@ class HomeActivity : BaseActivity() {
         setupMoodButtons(timeSpinner, citySpinner)
     }
 
+    override fun onResume() {
+        super.onResume()
+        refreshBottomNavSelection(R.id.nav_home)
+    }
+
     override fun onStart() {
         super.onStart()
 

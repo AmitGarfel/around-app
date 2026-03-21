@@ -56,4 +56,9 @@ class SettingsActivity : BaseActivity() {
             finish()
         }
     }
+
+    override fun onResume() {
+        super.onResume()
+        refreshBottomNavSelection(R.id.nav_settings)
+    }
 }

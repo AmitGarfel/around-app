@@ -13,29 +13,20 @@ import com.google.android.material.bottomnavigation.BottomNavigationView
 
 abstract class BaseActivity : AppCompatActivity() {
 
+    private var ignoreNextSelection = false
+
     protected fun setupBottomNav(selectedItemId: Int) {
         val bottomNav = findViewById<BottomNavigationView>(R.id.bottom_navigation) ?: return
 
-        ViewCompat.setLayoutDirection(bottomNav, ViewCompat.LAYOUT_DIRECTION_LTR)
-
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-            bottomNav.itemIconTintList = getColorStateList(R.color.bottom_nav_item_colors)
-            bottomNav.itemTextColor = getColorStateList(R.color.bottom_nav_item_colors)
-        } else {
-            @Suppress("DEPRECATION")
-            run {
-                bottomNav.itemIconTintList =
-                    resources.getColorStateList(R.color.bottom_nav_item_colors)
-                bottomNav.itemTextColor =
-                    resources.getColorStateList(R.color.bottom_nav_item_colors)
-            }
-        }
-
-        bottomNav.selectedItemId = selectedItemId
+        styleBottomNav(bottomNav)
 
         bottomNav.setOnItemSelectedListener { item ->
-            when (item.itemId) {
+            if (ignoreNextSelection) {
+                ignoreNextSelection = false
+                return@setOnItemSelectedListener true
+            }
 
+            when (item.itemId) {
                 R.id.nav_menu -> {
                     if (this !is MenuActivity) {
                         val intent = Intent(this, MenuActivity::class.java).apply {
@@ -68,7 +59,37 @@ abstract class BaseActivity : AppCompatActivity() {
         }
 
         bottomNav.setOnItemReselectedListener {
-            // Do nothing on reselect
+            // do nothing
+        }
+
+        refreshBottomNavSelection(selectedItemId)
+    }
+
+    protected fun refreshBottomNavSelection(selectedItemId: Int) {
+        val bottomNav = findViewById<BottomNavigationView>(R.id.bottom_navigation) ?: return
+
+        styleBottomNav(bottomNav)
+
+        if (bottomNav.selectedItemId != selectedItemId) {
+            ignoreNextSelection = true
+            bottomNav.selectedItemId = selectedItemId
+        }
+    }
+
+    private fun styleBottomNav(bottomNav: BottomNavigationView) {
+        ViewCompat.setLayoutDirection(bottomNav, ViewCompat.LAYOUT_DIRECTION_LTR)
+
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+            bottomNav.itemIconTintList = getColorStateList(R.color.bottom_nav_item_colors)
+            bottomNav.itemTextColor = getColorStateList(R.color.bottom_nav_item_colors)
+        } else {
+            @Suppress("DEPRECATION")
+            run {
+                bottomNav.itemIconTintList =
+                    resources.getColorStateList(R.color.bottom_nav_item_colors)
+                bottomNav.itemTextColor =
+                    resources.getColorStateList(R.color.bottom_nav_item_colors)
+            }
         }
     }
 

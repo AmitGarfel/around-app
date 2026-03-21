@@ -60,25 +60,19 @@ class MenuActivity : BaseActivity() {
         val uid = auth.currentUser?.uid ?: return
         checkAdminStatus(uid, layoutRegularActions, layoutAdminActions)
 
-        btnCreateRegular.setOnClickListener {
-            openCreate()
-        }
-
-        btnExploreRegular.setOnClickListener {
-            openExplore()
-        }
-
-        btnCreateAdmin.setOnClickListener {
-            openCreate()
-        }
-
-        btnExploreAdmin.setOnClickListener {
-            openExplore()
-        }
+        btnCreateRegular.setOnClickListener { openCreate() }
+        btnExploreRegular.setOnClickListener { openExplore() }
+        btnCreateAdmin.setOnClickListener { openCreate() }
+        btnExploreAdmin.setOnClickListener { openExplore() }
 
         btnAdmin.setOnClickListener {
             startActivity(Intent(this, AdminActivity::class.java))
         }
+    }
+
+    override fun onResume() {
+        super.onResume()
+        refreshBottomNavSelection(R.id.nav_menu)
     }
 
     private fun openCreate() {
@@ -89,6 +83,7 @@ class MenuActivity : BaseActivity() {
         val intent = Intent(this, HomeActivity::class.java)
         intent.putExtra(NavigationKeys.EXTRA_CITY, detectedCity)
         startActivity(intent)
+        overridePendingTransition(0, 0)
     }
 
     private fun checkLocationPermission() {
