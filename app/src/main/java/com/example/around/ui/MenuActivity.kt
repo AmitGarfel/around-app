@@ -58,11 +58,7 @@ class MenuActivity : BaseActivity() {
         }
 
         val uid = auth.currentUser?.uid ?: return
-        checkAdminStatus(
-            uid = uid,
-            regularLayout = layoutRegularActions,
-            adminLayout = layoutAdminActions
-        )
+        checkAdminStatus(uid, layoutRegularActions, layoutAdminActions)
 
         btnCreateRegular.setOnClickListener {
             openCreate()
@@ -112,8 +108,10 @@ class MenuActivity : BaseActivity() {
 
     private fun fetchCity() {
         locationHelper.getCityName { cityName ->
-            detectedCity = cityName
-            tvQuickInfo.text = "Near you: $cityName Tours"
+            runOnUiThread {
+                detectedCity = cityName
+                tvQuickInfo.text = "Near you: $cityName Tours"
+            }
         }
     }
 
@@ -139,12 +137,14 @@ class MenuActivity : BaseActivity() {
         adminLayout: View
     ) {
         usersRepo.isAdmin(uid) { isAdmin ->
-            if (isAdmin) {
-                regularLayout.visibility = View.GONE
-                adminLayout.visibility = View.VISIBLE
-            } else {
-                regularLayout.visibility = View.VISIBLE
-                adminLayout.visibility = View.GONE
+            runOnUiThread {
+                if (isAdmin) {
+                    regularLayout.visibility = View.GONE
+                    adminLayout.visibility = View.VISIBLE
+                } else {
+                    regularLayout.visibility = View.VISIBLE
+                    adminLayout.visibility = View.GONE
+                }
             }
         }
     }

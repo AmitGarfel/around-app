@@ -2,9 +2,9 @@
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
-    android:layout_height="match_parent">
+    android:layout_height="match_parent"
+    android:layoutDirection="ltr">
 
-    <!-- Background image like Menu -->
     <ImageView
         android:id="@+id/ivHomeBackground"
         android:layout_width="match_parent"
@@ -13,7 +13,6 @@
         android:scaleType="centerCrop"
         android:src="@drawable/city_bg" />
 
-    <!-- Scrollable content -->
     <ScrollView
         android:id="@+id/homeScroll"
         android:layout_width="match_parent"
@@ -26,16 +25,17 @@
             android:layout_height="wrap_content"
             android:gravity="center_horizontal"
             android:orientation="vertical"
-            android:paddingBottom="20dp">
+            android:paddingBottom="20dp"
+            android:layoutDirection="ltr">
 
-            <!-- Top header -->
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="40dp"
                 android:gravity="left"
                 android:orientation="vertical"
-                android:padding="24dp">
+                android:padding="24dp"
+                android:layoutDirection="ltr">
 
                 <TextView
                     android:id="@+id/tvGreeting"
@@ -44,7 +44,9 @@
                     android:text="Good evening 🌙"
                     android:textColor="#FFFFFF"
                     android:textSize="26sp"
-                    android:textStyle="bold" />
+                    android:textStyle="bold"
+                    android:layoutDirection="ltr"
+                    android:textDirection="ltr" />
 
                 <TextView
                     android:id="@+id/tvSubGreeting"
@@ -53,10 +55,11 @@
                     android:layout_marginTop="6dp"
                     android:text="Ready for your next route?"
                     android:textColor="#EDE7DD"
-                    android:textSize="14sp" />
+                    android:textSize="14sp"
+                    android:layoutDirection="ltr"
+                    android:textDirection="ltr" />
             </LinearLayout>
 
-            <!-- Main white card -->
             <com.google.android.material.card.MaterialCardView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
@@ -69,9 +72,9 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:orientation="vertical"
-                    android:padding="22dp">
+                    android:padding="22dp"
+                    android:layoutDirection="ltr">
 
-                    <!-- Time section -->
                     <TextView
                         android:id="@+id/tvVibeHint"
                         android:layout_width="wrap_content"
@@ -81,7 +84,9 @@
                         android:text="Change time, change vibe"
                         android:textColor="#7A6A5E"
                         android:textSize="14sp"
-                        android:textStyle="bold" />
+                        android:textStyle="bold"
+                        android:layoutDirection="ltr"
+                        android:textDirection="ltr" />
 
                     <Spinner
                         android:id="@+id/spinnerTimeOverride"
@@ -91,9 +96,9 @@
                         android:background="@drawable/spinner_bg_light"
                         android:entries="@array/time_options"
                         android:paddingHorizontal="14dp"
-                        android:popupBackground="#FFFFFF" />
+                        android:popupBackground="#FFFFFF"
+                        android:layoutDirection="ltr" />
 
-                    <!-- City override section -->
                     <TextView
                         android:id="@+id/tvCityHint"
                         android:layout_width="wrap_content"
@@ -104,7 +109,9 @@
                         android:text="Explore another city"
                         android:textColor="#7A6A5E"
                         android:textSize="14sp"
-                        android:textStyle="bold" />
+                        android:textStyle="bold"
+                        android:layoutDirection="ltr"
+                        android:textDirection="ltr" />
 
                     <Spinner
                         android:id="@+id/spinnerCityOverride"
@@ -112,59 +119,18 @@
                         android:layout_height="50dp"
                         android:background="@drawable/spinner_bg_light"
                         android:paddingHorizontal="14dp"
-                        android:popupBackground="#FFFFFF" />
+                        android:popupBackground="#FFFFFF"
+                        android:layoutDirection="ltr" />
 
-                    <!-- Mood grid -->
                     <GridLayout
                         android:id="@+id/moodGrid"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:layout_marginTop="14dp"
                         android:alignmentMode="alignMargins"
-                        android:columnCount="2">
+                        android:columnCount="2"
+                        android:layoutDirection="ltr">
 
-                        <!-- Foody -->
-                        <com.google.android.material.card.MaterialCardView
-                            android:layout_width="0dp"
-                            android:layout_height="wrap_content"
-                            android:layout_columnWeight="1"
-                            android:layout_margin="8dp"
-                            app:cardBackgroundColor="#F6F3EE"
-                            app:cardCornerRadius="16dp"
-                            app:cardElevation="3dp"
-                            app:strokeColor="#E6C76A"
-                            app:strokeWidth="1dp">
-
-                            <LinearLayout
-                                android:id="@+id/moodFoody"
-                                android:layout_width="match_parent"
-                                android:layout_height="wrap_content"
-                                android:clickable="true"
-                                android:focusable="true"
-                                android:foreground="?attr/selectableItemBackground"
-                                android:gravity="center"
-                                android:orientation="vertical"
-                                android:padding="18dp">
-
-                                <androidx.appcompat.widget.AppCompatImageView
-                                    android:layout_width="70dp"
-                                    android:layout_height="70dp"
-                                    android:background="@drawable/rounded_yellow_bg"
-                                    android:padding="18dp"
-                                    android:src="@drawable/ic_foody"
-                                    app:tint="#2D2321" />
-
-                                <com.google.android.material.textview.MaterialTextView
-                                    android:layout_width="wrap_content"
-                                    android:layout_height="wrap_content"
-                                    android:layout_marginTop="10dp"
-                                    android:text="foody"
-                                    android:textColor="#2D2321"
-                                    android:textStyle="bold" />
-                            </LinearLayout>
-                        </com.google.android.material.card.MaterialCardView>
-
-                        <!-- Culture -->
                         <com.google.android.material.card.MaterialCardView
                             android:layout_width="0dp"
                             android:layout_height="wrap_content"
@@ -185,7 +151,8 @@
                                 android:foreground="?attr/selectableItemBackground"
                                 android:gravity="center"
                                 android:orientation="vertical"
-                                android:padding="18dp">
+                                android:padding="18dp"
+                                android:layoutDirection="ltr">
 
                                 <androidx.appcompat.widget.AppCompatImageView
                                     android:layout_width="70dp"
@@ -205,7 +172,6 @@
                             </LinearLayout>
                         </com.google.android.material.card.MaterialCardView>
 
-                        <!-- Relax -->
                         <com.google.android.material.card.MaterialCardView
                             android:layout_width="0dp"
                             android:layout_height="wrap_content"
@@ -218,7 +184,7 @@
                             app:strokeWidth="1dp">
 
                             <LinearLayout
-                                android:id="@+id/moodRelax"
+                                android:id="@+id/moodFoody"
                                 android:layout_width="match_parent"
                                 android:layout_height="wrap_content"
                                 android:clickable="true"
@@ -226,27 +192,27 @@
                                 android:foreground="?attr/selectableItemBackground"
                                 android:gravity="center"
                                 android:orientation="vertical"
-                                android:padding="18dp">
+                                android:padding="18dp"
+                                android:layoutDirection="ltr">
 
                                 <androidx.appcompat.widget.AppCompatImageView
                                     android:layout_width="70dp"
                                     android:layout_height="70dp"
                                     android:background="@drawable/rounded_yellow_bg"
                                     android:padding="18dp"
-                                    android:src="@drawable/ic_spa"
+                                    android:src="@drawable/ic_foody"
                                     app:tint="#2D2321" />
 
                                 <com.google.android.material.textview.MaterialTextView
                                     android:layout_width="wrap_content"
                                     android:layout_height="wrap_content"
                                     android:layout_marginTop="10dp"
-                                    android:text="relax"
+                                    android:text="foody"
                                     android:textColor="#2D2321"
                                     android:textStyle="bold" />
                             </LinearLayout>
                         </com.google.android.material.card.MaterialCardView>
 
-                        <!-- Surprise -->
                         <com.google.android.material.card.MaterialCardView
                             android:layout_width="0dp"
                             android:layout_height="wrap_content"
@@ -267,7 +233,8 @@
                                 android:foreground="?attr/selectableItemBackground"
                                 android:gravity="center"
                                 android:orientation="vertical"
-                                android:padding="18dp">
+                                android:padding="18dp"
+                                android:layoutDirection="ltr">
 
                                 <androidx.appcompat.widget.AppCompatImageView
                                     android:layout_width="70dp"
@@ -287,11 +254,51 @@
                             </LinearLayout>
                         </com.google.android.material.card.MaterialCardView>
 
+                        <com.google.android.material.card.MaterialCardView
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_columnWeight="1"
+                            android:layout_margin="8dp"
+                            app:cardBackgroundColor="#F6F3EE"
+                            app:cardCornerRadius="16dp"
+                            app:cardElevation="3dp"
+                            app:strokeColor="#E6C76A"
+                            app:strokeWidth="1dp">
+
+                            <LinearLayout
+                                android:id="@+id/moodRelax"
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:clickable="true"
+                                android:focusable="true"
+                                android:foreground="?attr/selectableItemBackground"
+                                android:gravity="center"
+                                android:orientation="vertical"
+                                android:padding="18dp"
+                                android:layoutDirection="ltr">
+
+                                <androidx.appcompat.widget.AppCompatImageView
+                                    android:layout_width="70dp"
+                                    android:layout_height="70dp"
+                                    android:background="@drawable/rounded_yellow_bg"
+                                    android:padding="18dp"
+                                    android:src="@drawable/ic_spa"
+                                    app:tint="#2D2321" />
+
+                                <com.google.android.material.textview.MaterialTextView
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:layout_marginTop="10dp"
+                                    android:text="relax"
+                                    android:textColor="#2D2321"
+                                    android:textStyle="bold" />
+                            </LinearLayout>
+                        </com.google.android.material.card.MaterialCardView>
+
                     </GridLayout>
 
                 </LinearLayout>
             </com.google.android.material.card.MaterialCardView>
-
         </LinearLayout>
     </ScrollView>
 
@@ -301,8 +308,12 @@
         android:layout_height="wrap_content"
         android:layout_alignParentBottom="true"
         android:background="#FFFFFF"
-        app:itemIconTint="#2D2321"
-        app:itemTextColor="#2D2321"
+        android:layoutDirection="ltr"
+        android:textDirection="ltr"
+        app:itemIconTint="@color/bottom_nav_item_colors"
+        app:itemTextColor="@color/bottom_nav_item_colors"
+        app:labelVisibilityMode="labeled"
+        app:itemHorizontalTranslationEnabled="false"
         app:menu="@menu/bottom_nav_menu" />
 
 </RelativeLayout>

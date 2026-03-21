@@ -1,7 +1,10 @@
 package com.example.around.ui.base
 
 import android.content.Intent
+import android.os.Build
+import android.view.View
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.view.ViewCompat
 import com.example.around.R
 import com.example.around.ui.HomeActivity
 import com.example.around.ui.MenuActivity
@@ -13,6 +16,21 @@ abstract class BaseActivity : AppCompatActivity() {
     protected fun setupBottomNav(selectedItemId: Int) {
         val bottomNav = findViewById<BottomNavigationView>(R.id.bottom_navigation) ?: return
 
+        ViewCompat.setLayoutDirection(bottomNav, ViewCompat.LAYOUT_DIRECTION_LTR)
+
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+            bottomNav.itemIconTintList = getColorStateList(R.color.bottom_nav_item_colors)
+            bottomNav.itemTextColor = getColorStateList(R.color.bottom_nav_item_colors)
+        } else {
+            @Suppress("DEPRECATION")
+            run {
+                bottomNav.itemIconTintList =
+                    resources.getColorStateList(R.color.bottom_nav_item_colors)
+                bottomNav.itemTextColor =
+                    resources.getColorStateList(R.color.bottom_nav_item_colors)
+            }
+        }
+
         bottomNav.selectedItemId = selectedItemId
 
         bottomNav.setOnItemSelectedListener { item ->
@@ -20,9 +38,11 @@ abstract class BaseActivity : AppCompatActivity() {
 
                 R.id.nav_menu -> {
                     if (this !is MenuActivity) {
-                        startActivity(Intent(this, MenuActivity::class.java))
+                        val intent = Intent(this, MenuActivity::class.java).apply {
+                            addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_SINGLE_TOP)
+                        }
+                        startActivity(intent)
                         overridePendingTransition(0, 0)
-                        finish()
                     }
                     true
                 }
@@ -31,7 +51,6 @@ abstract class BaseActivity : AppCompatActivity() {
                     if (this !is HomeActivity) {
                         startActivity(Intent(this, HomeActivity::class.java))
                         overridePendingTransition(0, 0)
-                        finish()
                     }
                     true
                 }
@@ -40,7 +59,6 @@ abstract class BaseActivity : AppCompatActivity() {
                     if (this !is SettingsActivity) {
                         startActivity(Intent(this, SettingsActivity::class.java))
                         overridePendingTransition(0, 0)
-                        finish()
                     }
                     true
                 }
@@ -49,34 +67,14 @@ abstract class BaseActivity : AppCompatActivity() {
             }
         }
 
-        bottomNav.setOnItemReselectedListener { item ->
-            when (item.itemId) {
-
-                R.id.nav_menu -> {
-                    if (this !is MenuActivity) {
-                        startActivity(Intent(this, MenuActivity::class.java))
-                        overridePendingTransition(0, 0)
-                        finish()
-                    }
-                }
-
-                R.id.nav_home -> {
-                    if (this !is HomeActivity) {
-                        startActivity(Intent(this, HomeActivity::class.java))
-                        overridePendingTransition(0, 0)
-                        finish()
-                    }
-                }
-
-                R.id.nav_settings -> {
-                    if (this !is SettingsActivity) {
-                        startActivity(Intent(this, SettingsActivity::class.java))
-                        overridePendingTransition(0, 0)
-                        finish()
-                    }
-                }
-            }
+        bottomNav.setOnItemReselectedListener {
+            // Do nothing on reselect
         }
+    }
+
+    protected fun forceLtr(view: View?) {
+        view ?: return
+        ViewCompat.setLayoutDirection(view, ViewCompat.LAYOUT_DIRECTION_LTR)
     }
 
     protected fun isUserLoggedIn(): Boolean {

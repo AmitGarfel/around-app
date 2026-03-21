@@ -32,7 +32,8 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="vertical"
-            android:padding="24dp">
+            android:padding="24dp"
+            android:layoutDirection="ltr">
 
             <TextView
                 android:layout_width="wrap_content"
@@ -40,7 +41,9 @@
                 android:text="Account"
                 android:textColor="#2D2321"
                 android:textSize="24sp"
-                android:textStyle="bold" />
+                android:textStyle="bold"
+                android:layoutDirection="ltr"
+                android:textDirection="ltr" />
 
             <TextView
                 android:layout_width="wrap_content"
@@ -49,14 +52,18 @@
                 android:layout_marginBottom="22dp"
                 android:text="Your account details"
                 android:textColor="#666666"
-                android:textSize="14sp" />
+                android:textSize="14sp"
+                android:layoutDirection="ltr"
+                android:textDirection="ltr" />
 
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="First Name"
                 android:textColor="#888888"
-                android:textSize="13sp" />
+                android:textSize="13sp"
+                android:layoutDirection="ltr"
+                android:textDirection="ltr" />
 
             <TextView
                 android:id="@+id/tvFirstName"
@@ -67,14 +74,18 @@
                 android:text="—"
                 android:textColor="#000000"
                 android:textSize="17sp"
-                android:textStyle="bold" />
+                android:textStyle="bold"
+                android:layoutDirection="ltr"
+                android:textDirection="ltr" />
 
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="Last Name"
                 android:textColor="#888888"
-                android:textSize="13sp" />
+                android:textSize="13sp"
+                android:layoutDirection="ltr"
+                android:textDirection="ltr" />
 
             <TextView
                 android:id="@+id/tvLastName"
@@ -85,24 +96,30 @@
                 android:text="—"
                 android:textColor="#000000"
                 android:textSize="17sp"
-                android:textStyle="bold" />
+                android:textStyle="bold"
+                android:layoutDirection="ltr"
+                android:textDirection="ltr" />
 
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="Email"
                 android:textColor="#888888"
-                android:textSize="13sp" />
+                android:textSize="13sp"
+                android:layoutDirection="ltr"
+                android:textDirection="ltr" />
 
             <TextView
                 android:id="@+id/tvEmail"
-                android:layout_width="wrap_content"
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="6dp"
                 android:text="—"
                 android:textColor="#000000"
                 android:textSize="17sp"
-                android:textStyle="bold" />
+                android:textStyle="bold"
+                android:layoutDirection="ltr"
+                android:textDirection="ltr" />
 
             <Button
                 android:id="@+id/btnLogout"
@@ -121,7 +138,13 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_alignParentBottom="true"
-        app:itemIconTint="@color/black"
-        app:itemTextColor="@color/black"
+        android:background="#FFFFFF"
+        android:layoutDirection="ltr"
+        android:textDirection="ltr"
+        app:itemIconTint="@color/bottom_nav_item_colors"
+        app:itemTextColor="@color/bottom_nav_item_colors"
+        app:labelVisibilityMode="labeled"
+        app:itemHorizontalTranslationEnabled="false"
         app:menu="@menu/bottom_nav_menu" />
+
 </RelativeLayout>
