@@ -5,7 +5,6 @@
     android:layout_height="match_parent"
     android:layoutDirection="ltr">
 
-    <!-- Background -->
     <ImageView
         android:id="@+id/ivBackground"
         android:layout_width="match_parent"
@@ -14,14 +13,12 @@
         android:scaleType="centerCrop"
         android:contentDescription="@null" />
 
-    <!-- Dark overlay -->
     <View
         android:id="@+id/scrim"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:background="#66000000" />
 
-    <!-- Scrollable content -->
     <ScrollView
         android:id="@+id/stationsScroll"
         android:layout_width="match_parent"
@@ -35,7 +32,6 @@
             android:gravity="center_horizontal"
             android:paddingBottom="24dp">
 
-            <!-- Top area -->
             <RelativeLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
@@ -83,7 +79,6 @@
                 </LinearLayout>
             </RelativeLayout>
 
-            <!-- Main card -->
             <com.google.android.material.card.MaterialCardView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
@@ -112,7 +107,10 @@
                         <FrameLayout
                             android:id="@+id/mapTouchLayer"
                             android:layout_width="match_parent"
-                            android:layout_height="match_parent">
+                            android:layout_height="match_parent"
+                            android:clickable="true"
+                            android:focusable="true"
+                            android:descendantFocusability="beforeDescendants">
 
                             <androidx.fragment.app.FragmentContainerView
                                 android:id="@+id/mapFragment"
@@ -155,9 +153,9 @@
                     <androidx.recyclerview.widget.RecyclerView
                         android:id="@+id/rvStations"
                         android:layout_width="match_parent"
-                        android:layout_height="320dp"
+                        android:layout_height="wrap_content"
                         android:layout_marginTop="12dp"
-                        android:nestedScrollingEnabled="true" />
+                        android:nestedScrollingEnabled="false" />
 
                     <com.google.android.material.button.MaterialButton
                         android:id="@+id/btnNavigate"

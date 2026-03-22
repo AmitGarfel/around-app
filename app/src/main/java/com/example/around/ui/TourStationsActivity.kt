@@ -97,6 +97,7 @@ class TourStationsActivity : AppCompatActivity(), OnMapReadyCallback {
         gMap.uiSettings.isRotateGesturesEnabled = true
         gMap.uiSettings.isTiltGesturesEnabled = true
         gMap.uiSettings.isZoomControlsEnabled = true
+        gMap.uiSettings.isMapToolbarEnabled = true
 
         mapRenderer = MapRenderer(gMap)
         renderStationsOnMapIfReady()
@@ -116,7 +117,8 @@ class TourStationsActivity : AppCompatActivity(), OnMapReadyCallback {
             when (event.actionMasked) {
                 MotionEvent.ACTION_DOWN,
                 MotionEvent.ACTION_MOVE,
-                MotionEvent.ACTION_POINTER_DOWN -> {
+                MotionEvent.ACTION_POINTER_DOWN,
+                MotionEvent.ACTION_POINTER_UP -> {
                     scrollView.requestDisallowInterceptTouchEvent(true)
                 }
 
@@ -198,13 +200,14 @@ class TourStationsActivity : AppCompatActivity(), OnMapReadyCallback {
     private fun setupStationsList(stations: List<Station>) {
         val rv = findViewById<RecyclerView>(R.id.rvStations)
         rv.layoutManager = LinearLayoutManager(this)
+        rv.isNestedScrollingEnabled = false
 
         rv.adapter = StationsAdapter(stations) { station ->
-            navigateToStationByName(station)
+            navigateToStation(station)
         }
 
         findViewById<View>(R.id.btnNavigate).setOnClickListener {
-            navigateWholeTourByNames()
+            navigateWholeTour()
         }
     }
 
@@ -213,16 +216,19 @@ class TourStationsActivity : AppCompatActivity(), OnMapReadyCallback {
         if (stations.isEmpty()) return
         if (isResolving) return
 
-        if (resolvedPositions.size != stations.size) {
-            resolvedPositions = MutableList(stations.size) { null }
-        }
-
         isResolving = true
 
         ioScope.launch {
             for (i in stations.indices) {
-                val latLng = geocodeStation(stations[i])
-                resolvedPositions[i] = latLng
+                val station = stations[i]
+
+                resolvedPositions[i] = if (hasSavedCoordinates(station)) {
+                    LatLng(station.latitude, station.longitude)
+                } else {
+                    geocodeStation(station)
+                }
+
+                Log.d("MAP_DEBUG", "Resolved ${station.name} -> ${resolvedPositions[i]}")
             }
 
             withContext(Dispatchers.Main) {
@@ -232,15 +238,37 @@ class TourStationsActivity : AppCompatActivity(), OnMapReadyCallback {
         }
     }
 
+    private fun hasSavedCoordinates(station: Station): Boolean {
+        return station.latitude != 0.0 && station.longitude != 0.0
+    }
+
     private suspend fun geocodeStation(station: Station): LatLng? {
+        if (hasSavedCoordinates(station)) {
+            return LatLng(station.latitude, station.longitude)
+        }
+
         val queryText = PlaceQueryBuilder.build(station, tourCity)
-        if (queryText.isBlank()) return null
+        if (queryText.isBlank()) {
+            Log.d("MAP_DEBUG", "Blank query for ${station.name}")
+            return null
+        }
+
+        Log.d("MAP_DEBUG", "Geocoding query for ${station.name}: $queryText")
         return geocodingRepo.geocode(queryText)
     }
 
-    private fun navigateToStationByName(station: Station) {
-        val searchText = PlaceQueryBuilder.build(station, tourCity)
+    private fun navigateToStation(station: Station) {
+        if (hasSavedCoordinates(station)) {
+            navRepo.navigateToLatLng(
+                latitude = station.latitude,
+                longitude = station.longitude,
+                label = station.name,
+                navMode = selectedTravelModeNav
+            )
+            return
+        }
 
+        val searchText = PlaceQueryBuilder.build(station, tourCity)
         if (searchText.isBlank()) {
             Toast.makeText(this, "Destination not found", Toast.LENGTH_SHORT).show()
             return
@@ -249,7 +277,7 @@ class TourStationsActivity : AppCompatActivity(), OnMapReadyCallback {
         navRepo.navigateToSearchPlace(searchText, selectedTravelModeNav)
     }
 
-    private fun navigateWholeTourByNames() {
+    private fun navigateWholeTour() {
         if (stations.size < 2) {
             Toast.makeText(this, "Need at least 2 stations for a route", Toast.LENGTH_SHORT).show()
             return

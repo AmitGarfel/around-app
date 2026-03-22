@@ -5,7 +5,7 @@ import com.example.around.domain.model.Station
 object PlaceQueryBuilder {
 
     fun build(station: Station, city: String?): String {
-        val base = station.query.trim().ifBlank { station.name.trim() }
+        val base = station.name.trim().ifBlank { station.query.trim() }
         return build(base, city)
     }
 
@@ -15,13 +15,10 @@ object PlaceQueryBuilder {
 
         if (base.isBlank()) return ""
 
-        return if (
-            normalizedCity.isNotBlank() &&
-            !base.contains(normalizedCity, ignoreCase = true)
-        ) {
-            "$base, $normalizedCity"
-        } else {
-            base
+        return when {
+            normalizedCity.isBlank() -> "$base, Israel"
+            base.contains(normalizedCity, ignoreCase = true) -> "$base, Israel"
+            else -> "$base, $normalizedCity, Israel"
         }
     }
 

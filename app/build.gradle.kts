@@ -62,9 +62,11 @@ dependencies {
     implementation("androidx.activity:activity-ktx:1.9.2")
     implementation("androidx.constraintlayout:constraintlayout:2.1.4")
 
-    // ✅ Google Play Services - מפות ומיקום
+    // ✅ Google Play Services - מפות, מיקום וחיפוש מקומות
     implementation("com.google.android.gms:play-services-maps:18.2.0")
     implementation("com.google.android.gms:play-services-location:21.3.0")
+    // השורה שחסרה לך כדי לפתור את השגיאות:
+    implementation("com.google.android.libraries.places:places:3.3.0")
 
     // ✅ Firebase (שימוש ב-BOM לניהול גרסאות)
     implementation(platform("com.google.firebase:firebase-bom:34.8.0"))
