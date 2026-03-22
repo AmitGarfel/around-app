@@ -105,6 +105,12 @@ class MenuActivity : BaseActivity() {
         locationHelper.getCityName { cityName ->
             runOnUiThread {
                 detectedCity = cityName
+
+                getSharedPreferences("around_prefs", MODE_PRIVATE)
+                    .edit()
+                    .putString("last_detected_city", cityName)
+                    .apply()
+
                 tvQuickInfo.text = "Near you: $cityName Tours"
             }
         }

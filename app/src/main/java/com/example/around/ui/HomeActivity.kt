@@ -29,8 +29,12 @@ class HomeActivity : BaseActivity() {
         val timeSpinner = findViewById<Spinner>(R.id.spinnerTimeOverride)
         val citySpinner = findViewById<Spinner>(R.id.spinnerCityOverride)
 
+        val savedCity = getSharedPreferences("around_prefs", MODE_PRIVATE)
+            .getString("last_detected_city", "Tel Aviv")
+            .orEmpty()
+
         detectedCity = CityNormalizer.canonical(
-            intent.getStringExtra(NavigationKeys.EXTRA_CITY) ?: "Tel Aviv"
+            intent.getStringExtra(NavigationKeys.EXTRA_CITY) ?: savedCity
         )
 
         val autoTimeContext = getAutomaticTimeContext()

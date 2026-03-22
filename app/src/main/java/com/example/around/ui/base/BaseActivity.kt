@@ -40,7 +40,16 @@ abstract class BaseActivity : AppCompatActivity() {
 
                 R.id.nav_home -> {
                     if (this !is HomeActivity) {
-                        startActivity(Intent(this, HomeActivity::class.java))
+                        val savedCity = getSharedPreferences("around_prefs", MODE_PRIVATE)
+                            .getString("last_detected_city", "Tel Aviv")
+                            .orEmpty()
+
+                        val intent = Intent(this, HomeActivity::class.java).apply {
+                            putExtra(com.example.around.util.NavigationKeys.EXTRA_CITY, savedCity)
+                            addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_SINGLE_TOP)
+                        }
+
+                        startActivity(intent)
                         overridePendingTransition(0, 0)
                     }
                     true
