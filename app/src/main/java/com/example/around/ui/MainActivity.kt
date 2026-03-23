@@ -10,6 +10,7 @@ import com.example.around.R
 import com.example.around.di.AppGraph
 import com.example.around.ui.formatters.AuthMessageFormatter
 import com.example.around.ui.formatters.AuthUiFormatter
+import com.example.around.ui.helpers.AuthFormReader
 import com.example.around.ui.helpers.AuthFormValidator
 import com.example.around.ui.helpers.AuthModeUiBinder
 import com.example.around.ui.helpers.AuthNavigationHelper
@@ -87,18 +88,23 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun login() {
-        val email = emailInput.text.toString().trim()
-        val password = passwordInput.text.toString().trim()
+        val form = AuthFormReader.readLogin(
+            emailInput = emailInput,
+            passwordInput = passwordInput
+        )
 
-        val error = AuthFormValidator.validateLogin(email, password)
+        val error = AuthFormValidator.validateLogin(
+            email = form.email,
+            password = form.password
+        )
         if (error != null) {
             Toast.makeText(this, error, Toast.LENGTH_SHORT).show()
             return
         }
 
         authUseCase.login(
-            email = email,
-            password = password,
+            email = form.email,
+            password = form.password,
             onSuccess = {
                 Toast.makeText(
                     this,
@@ -118,18 +124,20 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun register() {
-        val firstName = firstNameInput.text.toString().trim()
-        val lastName = lastNameInput.text.toString().trim()
-        val email = emailInput.text.toString().trim()
-        val password = passwordInput.text.toString().trim()
-        val confirmPassword = confirmPasswordInput.text.toString().trim()
+        val form = AuthFormReader.readRegister(
+            firstNameInput = firstNameInput,
+            lastNameInput = lastNameInput,
+            emailInput = emailInput,
+            passwordInput = passwordInput,
+            confirmPasswordInput = confirmPasswordInput
+        )
 
         val error = AuthFormValidator.validateRegister(
-            firstName = firstName,
-            lastName = lastName,
-            email = email,
-            password = password,
-            confirmPassword = confirmPassword
+            firstName = form.firstName,
+            lastName = form.lastName,
+            email = form.email,
+            password = form.password,
+            confirmPassword = form.confirmPassword
         )
 
         if (error != null) {
@@ -138,10 +146,10 @@ class MainActivity : AppCompatActivity() {
         }
 
         authUseCase.register(
-            firstName = firstName,
-            lastName = lastName,
-            email = email,
-            password = password,
+            firstName = form.firstName,
+            lastName = form.lastName,
+            email = form.email,
+            password = form.password,
             onSuccess = {
                 Toast.makeText(
                     this,
