@@ -10,6 +10,9 @@ import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import com.example.around.R
 import com.example.around.di.AppGraph
+import com.example.around.ui.formatters.AuthUiFormatter
+import com.example.around.ui.helpers.AuthFormValidator
+import com.example.around.ui.models.AuthScreenMode
 
 class MainActivity : AppCompatActivity() {
 
@@ -26,7 +29,7 @@ class MainActivity : AppCompatActivity() {
     private lateinit var switchModeText: TextView
     private lateinit var actionButton: Button
 
-    private var isLoginMode = true
+    private var screenMode = AuthScreenMode.LOGIN
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -52,49 +55,41 @@ class MainActivity : AppCompatActivity() {
         updateModeUi()
 
         actionButton.setOnClickListener {
-            if (isLoginMode) {
-                login()
-            } else {
-                register()
+            when (screenMode) {
+                AuthScreenMode.LOGIN -> login()
+                AuthScreenMode.REGISTER -> register()
             }
         }
 
         switchModeText.setOnClickListener {
-            isLoginMode = !isLoginMode
+            screenMode = when (screenMode) {
+                AuthScreenMode.LOGIN -> AuthScreenMode.REGISTER
+                AuthScreenMode.REGISTER -> AuthScreenMode.LOGIN
+            }
             updateModeUi()
         }
     }
 
     private fun updateModeUi() {
-        if (isLoginMode) {
-            titleText.text = "Welcome back"
-            subtitleText.text = "Log in to continue exploring routes around you"
-            actionButton.text = "Login"
+        val ui = AuthUiFormatter.build(screenMode)
 
-            firstNameInput.visibility = View.GONE
-            lastNameInput.visibility = View.GONE
-            confirmPasswordInput.visibility = View.GONE
+        titleText.text = ui.title
+        subtitleText.text = ui.subtitle
+        actionButton.text = ui.actionText
+        switchModeText.text = ui.switchText
 
-            switchModeText.text = "Don’t have an account? Sign up"
-        } else {
-            titleText.text = "Create account"
-            subtitleText.text = "Sign up and start building your own tours"
-            actionButton.text = "Create Account"
-
-            firstNameInput.visibility = View.VISIBLE
-            lastNameInput.visibility = View.VISIBLE
-            confirmPasswordInput.visibility = View.VISIBLE
-
-            switchModeText.text = "Already have an account? Login"
-        }
+        firstNameInput.visibility = if (ui.showNameFields) View.VISIBLE else View.GONE
+        lastNameInput.visibility = if (ui.showNameFields) View.VISIBLE else View.GONE
+        confirmPasswordInput.visibility = if (ui.showConfirmPassword) View.VISIBLE else View.GONE
     }
 
     private fun login() {
         val email = emailInput.text.toString().trim()
         val password = passwordInput.text.toString().trim()
 
-        if (email.isEmpty() || password.isEmpty()) {
-            Toast.makeText(this, "Please fill in email and password", Toast.LENGTH_SHORT).show()
+        val error = AuthFormValidator.validateLogin(email, password)
+        if (error != null) {
+            Toast.makeText(this, error, Toast.LENGTH_SHORT).show()
             return
         }
 
@@ -118,18 +113,16 @@ class MainActivity : AppCompatActivity() {
         val password = passwordInput.text.toString().trim()
         val confirmPassword = confirmPasswordInput.text.toString().trim()
 
-        if (firstName.isEmpty() || lastName.isEmpty() || email.isEmpty() || password.isEmpty() || confirmPassword.isEmpty()) {
-            Toast.makeText(this, "Please fill in all fields", Toast.LENGTH_SHORT).show()
-            return
-        }
+        val error = AuthFormValidator.validateRegister(
+            firstName = firstName,
+            lastName = lastName,
+            email = email,
+            password = password,
+            confirmPassword = confirmPassword
+        )
 
-        if (password.length < 6) {
-            Toast.makeText(this, "Password must be at least 6 characters", Toast.LENGTH_SHORT).show()
-            return
-        }
-
-        if (password != confirmPassword) {
-            Toast.makeText(this, "Passwords do not match", Toast.LENGTH_SHORT).show()
+        if (error != null) {
+            Toast.makeText(this, error, Toast.LENGTH_SHORT).show()
             return
         }
 
