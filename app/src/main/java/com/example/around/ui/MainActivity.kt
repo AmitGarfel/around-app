@@ -1,7 +1,6 @@
 package com.example.around.ui
 
 import android.os.Bundle
-import android.view.View
 import android.widget.Button
 import android.widget.EditText
 import android.widget.TextView
@@ -12,6 +11,7 @@ import com.example.around.di.AppGraph
 import com.example.around.ui.formatters.AuthMessageFormatter
 import com.example.around.ui.formatters.AuthUiFormatter
 import com.example.around.ui.helpers.AuthFormValidator
+import com.example.around.ui.helpers.AuthModeUiBinder
 import com.example.around.ui.helpers.AuthNavigationHelper
 import com.example.around.ui.models.AuthScreenMode
 
@@ -74,14 +74,16 @@ class MainActivity : AppCompatActivity() {
     private fun updateModeUi() {
         val ui = AuthUiFormatter.build(screenMode)
 
-        titleText.text = ui.title
-        subtitleText.text = ui.subtitle
-        actionButton.text = ui.actionText
-        switchModeText.text = ui.switchText
-
-        firstNameInput.visibility = if (ui.showNameFields) View.VISIBLE else View.GONE
-        lastNameInput.visibility = if (ui.showNameFields) View.VISIBLE else View.GONE
-        confirmPasswordInput.visibility = if (ui.showConfirmPassword) View.VISIBLE else View.GONE
+        AuthModeUiBinder.bind(
+            ui = ui,
+            titleText = titleText,
+            subtitleText = subtitleText,
+            switchModeText = switchModeText,
+            actionButton = actionButton,
+            firstNameInput = firstNameInput,
+            lastNameInput = lastNameInput,
+            confirmPasswordInput = confirmPasswordInput
+        )
     }
 
     private fun login() {
