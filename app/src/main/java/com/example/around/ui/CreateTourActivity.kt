@@ -15,11 +15,13 @@ import androidx.activity.result.contract.ActivityResultContracts
 import androidx.lifecycle.lifecycleScope
 import com.example.around.R
 import com.example.around.di.AppGraph
-import com.example.around.domain.model.Station
-import com.example.around.domain.model.Tour
 import com.example.around.ui.base.BaseActivity
 import com.example.around.ui.helpers.CreateTourDurationHelper
 import com.example.around.ui.helpers.CreateTourHelper
+import com.example.around.ui.helpers.CreateTourImageHelper
+import com.example.around.ui.helpers.CreateTourPlacesHelper
+import com.example.around.ui.helpers.CreateTourStationFieldsHelper
+import com.example.around.ui.helpers.StationSelectionManager
 import com.example.around.util.CityNormalizer
 import com.google.android.gms.maps.model.LatLng
 import com.google.android.libraries.places.api.Places
@@ -34,23 +36,17 @@ class CreateTourActivity : BaseActivity() {
     private val createTourUseCase = AppGraph.createTourUseCase
     private var selectedImageUri: Uri? = null
 
-    private data class SelectedStationData(
-        val name: String,
-        val query: String,
-        val latLng: LatLng
-    )
-
-    private val selectedStations = mutableMapOf<Int, SelectedStationData>()
+    private val stationManager = StationSelectionManager()
     private var activeStationIndex: Int = -1
 
     private val pickImageLauncher =
         registerForActivityResult(ActivityResultContracts.GetContent()) { uri ->
             if (uri != null) {
                 selectedImageUri = uri
-                findViewById<ImageView?>(R.id.ivPreview)?.let { preview ->
-                    preview.visibility = ImageView.VISIBLE
-                    preview.setImageURI(uri)
-                }
+                CreateTourImageHelper.applyPreview(
+                    findViewById(R.id.ivPreview),
+                    uri
+                )
                 Toast.makeText(this, "Image selected successfully ✅", Toast.LENGTH_SHORT).show()
             }
         }
@@ -59,7 +55,6 @@ class CreateTourActivity : BaseActivity() {
         registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
 
             when (result.resultCode) {
-
                 RESULT_OK -> {
                     if (result.data != null && activeStationIndex != -1) {
                         val place = Autocomplete.getPlaceFromIntent(result.data!!)
@@ -68,7 +63,8 @@ class CreateTourActivity : BaseActivity() {
                         val address = place.address?.trim().orEmpty()
 
                         if (latLng != null && name.isNotBlank()) {
-                            selectedStations[activeStationIndex] = SelectedStationData(
+                            stationManager.setStation(
+                                index = activeStationIndex,
                                 name = name,
                                 query = address.ifBlank { name },
                                 latLng = latLng
@@ -194,12 +190,7 @@ class CreateTourActivity : BaseActivity() {
     }
 
     private fun setupStationPickers() {
-        val ids = listOf(
-            R.id.etStation1,
-            R.id.etStation2,
-            R.id.etStation3,
-            R.id.etStation4
-        )
+        val ids = CreateTourStationFieldsHelper.stationFieldIds()
 
         ids.forEachIndexed { index, id ->
             val et = findViewById<EditText>(id)
@@ -227,12 +218,10 @@ class CreateTourActivity : BaseActivity() {
 
                 val currentText = et.text.toString().trim()
 
-                val initialQuery = when {
-                    currentText.isNotBlank() && city.isNotBlank() -> "$currentText $city"
-                    currentText.isNotBlank() -> currentText
-                    city.isNotBlank() -> city
-                    else -> ""
-                }
+                val initialQuery = CreateTourPlacesHelper.buildInitialQuery(
+                    currentText = currentText,
+                    city = city
+                )
 
                 val builder = Autocomplete.IntentBuilder(
                     AutocompleteActivityMode.FULLSCREEN,
@@ -250,26 +239,17 @@ class CreateTourActivity : BaseActivity() {
             }
         }
     }
-    private fun updateStationField(index: Int, value: String) {
-        val id = when (index) {
-            0 -> R.id.etStation1
-            1 -> R.id.etStation2
-            2 -> R.id.etStation3
-            3 -> R.id.etStation4
-            else -> return
-        }
 
+    private fun updateStationField(index: Int, value: String) {
+        val id = CreateTourStationFieldsHelper.stationFieldIdAt(index) ?: return
         findViewById<EditText>(id).setText(value)
         updateDurationDefault()
     }
 
     private fun updateDurationDefault() {
-        val stationTexts = listOf(
-            findViewById<EditText>(R.id.etStation1).text.toString(),
-            findViewById<EditText>(R.id.etStation2).text.toString(),
-            findViewById<EditText>(R.id.etStation3).text.toString(),
-            findViewById<EditText>(R.id.etStation4).text.toString()
-        )
+        val stationTexts = CreateTourStationFieldsHelper.stationFieldIds().map { id ->
+            findViewById<EditText>(id).text.toString()
+        }
 
         val stationsCount = CreateTourDurationHelper.countFilledStations(stationTexts)
         val suggested = CreateTourDurationHelper.suggestDuration(stationsCount)
@@ -299,38 +279,22 @@ class CreateTourActivity : BaseActivity() {
             return
         }
 
-        val stationsList = mutableListOf<Station>()
-        val ids = listOf(
-            R.id.etStation1,
-            R.id.etStation2,
-            R.id.etStation3,
-            R.id.etStation4
-        )
+        val ids = CreateTourStationFieldsHelper.stationFieldIds()
 
         ids.forEachIndexed { index, id ->
             val text = findViewById<EditText>(id).text.toString().trim()
 
-            if (text.isNotBlank()) {
-                val selected = selectedStations[index]
-                if (selected == null) {
-                    Toast.makeText(
-                        this,
-                        "Please choose station ${index + 1} from Google search",
-                        Toast.LENGTH_SHORT
-                    ).show()
-                    return
-                }
-
-                stationsList.add(
-                    Station(
-                        name = selected.name,
-                        query = selected.query,
-                        latitude = selected.latLng.latitude,
-                        longitude = selected.latLng.longitude
-                    )
-                )
+            if (text.isNotBlank() && !stationManager.hasStationAt(index)) {
+                Toast.makeText(
+                    this,
+                    "Please choose station ${index + 1} from Google search",
+                    Toast.LENGTH_SHORT
+                ).show()
+                return
             }
         }
+
+        val stationsList = stationManager.buildStationsList()
 
         val stationsError = CreateTourHelper.validateStations(stationsList)
         if (stationsError != null) {
