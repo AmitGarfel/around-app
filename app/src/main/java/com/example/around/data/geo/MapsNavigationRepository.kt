@@ -66,7 +66,31 @@ class MapsNavigationRepository(
         }
     }
 
-    fun navigateRouteByNames(
+    fun openTransitDirections(destination: String) {
+        if (destination.isBlank()) return
+
+        val uri = Uri.parse(
+            "https://www.google.com/maps/dir/?api=1" +
+                    "&destination=${Uri.encode(destination)}" +
+                    "&travelmode=transit"
+        )
+
+        val intent = Intent(Intent.ACTION_VIEW, uri).apply {
+            setPackage("com.google.android.apps.maps")
+            addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+        }
+
+        try {
+            context.startActivity(intent)
+        } catch (_: ActivityNotFoundException) {
+            val fallback = Intent(Intent.ACTION_VIEW, uri).apply {
+                addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+            }
+            context.startActivity(fallback)
+        }
+    }
+
+    fun previewRouteByNames(
         points: List<String>,
         travelModeDir: String
     ) {
@@ -101,7 +125,7 @@ class MapsNavigationRepository(
         }
     }
 
-    fun navigateRouteByLatLng(
+    fun previewRouteByLatLng(
         points: List<LatLng>,
         travelModeDir: String
     ) {

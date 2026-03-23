@@ -171,6 +171,23 @@
                         app:icon="@android:drawable/ic_dialog_map"
                         app:iconPadding="10dp"
                         app:iconTint="#2D2321" />
+
+                    <com.google.android.material.button.MaterialButton
+                        android:id="@+id/btnNextStation"
+                        android:layout_width="match_parent"
+                        android:layout_height="52dp"
+                        android:layout_marginTop="10dp"
+                        android:text="Next Station"
+                        android:textAllCaps="false"
+                        android:textColor="#2D2321"
+                        android:textStyle="bold"
+                        app:backgroundTint="#FFFFFF"
+                        app:cornerRadius="18dp"
+                        app:strokeWidth="1dp"
+                        app:strokeColor="#E6C76A"
+                        app:icon="@android:drawable/ic_media_next"
+                        app:iconPadding="10dp"
+                        app:iconTint="#2D2321" />
                 </LinearLayout>
             </com.google.android.material.card.MaterialCardView>
         </LinearLayout>

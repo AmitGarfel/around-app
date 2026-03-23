@@ -41,6 +41,7 @@ class TourStationsActivity : AppCompatActivity(), OnMapReadyCallback {
     private val toursRepo = AppGraph.toursRepo
     private lateinit var geocodingRepo: GeocodingRepository
     private lateinit var navRepo: MapsNavigationRepository
+    private lateinit var stationsAdapter: StationsAdapter
 
     private var mapRenderer: MapRenderer? = null
 
@@ -51,6 +52,8 @@ class TourStationsActivity : AppCompatActivity(), OnMapReadyCallback {
 
     private var selectedTravelModeDir = "driving"
     private var selectedTravelModeNav = "d"
+
+    private var currentStationIndex = 0
 
     private val ioScope = CoroutineScope(SupervisorJob() + Dispatchers.IO)
 
@@ -66,6 +69,7 @@ class TourStationsActivity : AppCompatActivity(), OnMapReadyCallback {
 
         setupBackButton()
         setupMapTouchInScroll()
+        setupTravelModeSpinner()
 
         val incomingId = intent.getStringExtra(NavigationKeys.EXTRA_TOUR_ID)
         if (incomingId.isNullOrBlank()) {
@@ -74,8 +78,6 @@ class TourStationsActivity : AppCompatActivity(), OnMapReadyCallback {
             return
         }
         tourId = incomingId
-
-        setupTravelModeSpinner()
 
         val mapFragment = supportFragmentManager
             .findFragmentById(R.id.mapFragment) as SupportMapFragment
@@ -180,6 +182,7 @@ class TourStationsActivity : AppCompatActivity(), OnMapReadyCallback {
                 tourName = tour.name
                 tourCity = CityNormalizer.canonical(tour.city)
                 stations = tour.stations
+                currentStationIndex = 0
 
                 resolvedPositions = MutableList(stations.size) { null }
 
@@ -202,12 +205,20 @@ class TourStationsActivity : AppCompatActivity(), OnMapReadyCallback {
         rv.layoutManager = LinearLayoutManager(this)
         rv.isNestedScrollingEnabled = false
 
-        rv.adapter = StationsAdapter(stations) { station ->
+        stationsAdapter = StationsAdapter(stations) { station ->
             navigateToStation(station)
         }
 
+        rv.adapter = stationsAdapter
+        stationsAdapter.updateCurrentStation(currentStationIndex)
+
         findViewById<View>(R.id.btnNavigate).setOnClickListener {
-            navigateWholeTour()
+            navigateToStationByIndex(currentStationIndex)
+        }
+
+        val btnNextStation = findViewById<View?>(R.id.btnNextStation)
+        btnNextStation?.setOnClickListener {
+            moveToNextStation()
         }
     }
 
@@ -258,6 +269,23 @@ class TourStationsActivity : AppCompatActivity(), OnMapReadyCallback {
     }
 
     private fun navigateToStation(station: Station) {
+        val searchText = PlaceQueryBuilder.build(station, tourCity)
+
+        if (selectedTravelModeDir == "transit") {
+            if (searchText.isBlank()) {
+                Toast.makeText(this, "Destination not found", Toast.LENGTH_SHORT).show()
+                return
+            }
+
+            navRepo.openTransitDirections(searchText)
+            return
+        }
+
+        if (searchText.isNotBlank()) {
+            navRepo.navigateToSearchPlace(searchText, selectedTravelModeNav)
+            return
+        }
+
         if (hasSavedCoordinates(station)) {
             navRepo.navigateToLatLng(
                 latitude = station.latitude,
@@ -268,29 +296,34 @@ class TourStationsActivity : AppCompatActivity(), OnMapReadyCallback {
             return
         }
 
-        val searchText = PlaceQueryBuilder.build(station, tourCity)
-        if (searchText.isBlank()) {
-            Toast.makeText(this, "Destination not found", Toast.LENGTH_SHORT).show()
-            return
-        }
-
-        navRepo.navigateToSearchPlace(searchText, selectedTravelModeNav)
+        Toast.makeText(this, "Destination not found", Toast.LENGTH_SHORT).show()
     }
 
-    private fun navigateWholeTour() {
-        if (stations.size < 2) {
-            Toast.makeText(this, "Need at least 2 stations for a route", Toast.LENGTH_SHORT).show()
+    private fun navigateToStationByIndex(index: Int) {
+        if (index !in stations.indices) {
+            Toast.makeText(this, "No more stations in this tour", Toast.LENGTH_SHORT).show()
             return
         }
 
-        val points = PlaceQueryBuilder.buildAll(stations, tourCity)
+        val station = stations[index]
+        navigateToStation(station)
+    }
 
-        if (points.size < 2) {
-            Toast.makeText(this, "Couldn't build route points", Toast.LENGTH_SHORT).show()
+    private fun moveToNextStation() {
+        if (stations.isEmpty()) {
+            Toast.makeText(this, "No stations found", Toast.LENGTH_SHORT).show()
             return
         }
 
-        Log.d("NAV_NAMES", "mode=$selectedTravelModeDir points=$points")
-        navRepo.navigateRouteByNames(points, selectedTravelModeDir)
+        if (currentStationIndex < stations.lastIndex) {
+            currentStationIndex++
+            stationsAdapter.updateCurrentStation(currentStationIndex)
+            findViewById<RecyclerView>(R.id.rvStations).smoothScrollToPosition(currentStationIndex)
+
+            val stationName = stations[currentStationIndex].name.ifBlank { "next station" }
+            Toast.makeText(this, "Current stop: $stationName", Toast.LENGTH_SHORT).show()
+        } else {
+            Toast.makeText(this, "You reached the last station 🎉", Toast.LENGTH_SHORT).show()
+        }
     }
 }
