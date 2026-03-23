@@ -17,6 +17,7 @@ import com.example.around.data.geo.LocationHelper
 import com.example.around.di.AppGraph
 import com.example.around.domain.model.Tour
 import com.example.around.ui.base.BaseActivity
+import com.example.around.ui.helpers.TourLikeUiHelper
 import com.example.around.util.NavigationKeys
 
 class TourListActivity : BaseActivity() {
@@ -129,8 +130,9 @@ class TourListActivity : BaseActivity() {
 
         val userId = auth.currentUser?.uid
 
-        recyclerView.adapter = TourAdapter(tours) { tourItem, prevLiked, prevCount, doneUi ->
+        recyclerView.adapter = TourAdapter(tours) { tourItem, previousState, doneUi ->
             if (userId == null) {
+                TourLikeUiHelper.restorePreviousState(tourItem, previousState)
                 doneUi()
                 return@TourAdapter
             }
@@ -145,8 +147,7 @@ class TourListActivity : BaseActivity() {
                     doneUi()
                 },
                 onError = {
-                    tourItem.isLikedByMe = prevLiked
-                    tourItem.likesCount = prevCount
+                    TourLikeUiHelper.restorePreviousState(tourItem, previousState)
                     doneUi()
                 }
             )

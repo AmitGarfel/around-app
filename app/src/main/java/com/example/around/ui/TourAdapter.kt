@@ -15,7 +15,11 @@ import com.example.around.ui.helpers.TourLikeUiHelper
 
 class TourAdapter(
     private var tourList: List<Tour>,
-    private val onLikeClick: (tour: Tour, prevLiked: Boolean, prevCount: Int, doneUi: () -> Unit) -> Unit
+    private val onLikeClick: (
+        tour: Tour,
+        previousState: TourLikeUiHelper.PreviousState,
+        doneUi: () -> Unit
+    ) -> Unit
 ) : RecyclerView.Adapter<TourAdapter.TourViewHolder>() {
 
     class TourViewHolder(view: View) : RecyclerView.ViewHolder(view) {
@@ -58,8 +62,7 @@ class TourAdapter(
 
             onLikeClick(
                 tour,
-                previousState.wasLiked,
-                previousState.likesCount
+                previousState
             ) {
                 holder.btnLike.isEnabled = true
                 updateLikeUI(holder.btnLike, tour.isLikedByMe)

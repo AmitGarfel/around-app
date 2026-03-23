@@ -69,10 +69,4 @@ class AdminTourAdapter(
     }
 
     override fun getItemCount(): Int = tourList.size
-
-    fun removeAt(position: Int) {
-        if (position < 0 || position >= tourList.size) return
-        tourList.removeAt(position)
-        notifyItemRemoved(position)
-    }
 }

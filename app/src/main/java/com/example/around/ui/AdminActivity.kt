@@ -8,10 +8,14 @@ import com.example.around.R
 import com.example.around.di.AppGraph
 import com.example.around.domain.model.Tour
 import com.example.around.ui.base.BaseActivity
+import com.example.around.ui.formatters.AdminMessageFormatter
+import com.example.around.ui.helpers.AdminStatusMapper
+import com.example.around.ui.helpers.PendingToursUiHelper
 
 class AdminActivity : BaseActivity() {
 
-    private val toursRepo = AppGraph.toursRepo
+    private val getPendingToursUseCase = AppGraph.getPendingToursUseCase
+    private val updateTourStatusUseCase = AppGraph.updateTourStatusUseCase
 
     private lateinit var recyclerView: RecyclerView
     private lateinit var adapter: AdminTourAdapter
@@ -22,47 +26,71 @@ class AdminActivity : BaseActivity() {
         setContentView(R.layout.activity_admin)
 
         setupBottomNav(R.id.nav_menu)
+        setupRecyclerView()
+        fetchPendingTours()
+    }
 
+    private fun setupRecyclerView() {
         recyclerView = findViewById(R.id.rvPendingTours)
         recyclerView.layoutManager = LinearLayoutManager(this)
 
         adapter = AdminTourAdapter(pendingList) { tourId, isApproved ->
-            val pos = pendingList.indexOfFirst { it.id == tourId }
-            if (pos == -1) return@AdminTourAdapter
-            updateTourStatus(tourId, isApproved, pos)
+            handleTourAction(tourId, isApproved)
         }
 
         recyclerView.adapter = adapter
+    }
 
-        fetchPendingTours()
+    private fun handleTourAction(tourId: String, isApproved: Boolean) {
+        val position = PendingToursUiHelper.findPositionByTourId(pendingList, tourId)
+        if (position == -1) return
+
+        updateTourStatus(
+            tourId = tourId,
+            newStatus = AdminStatusMapper.toStatus(isApproved),
+            position = position
+        )
     }
 
     private fun fetchPendingTours() {
-        toursRepo.getPendingTours(
+        getPendingToursUseCase(
             onSuccess = { list ->
-                pendingList.clear()
-                pendingList.addAll(list)
-                adapter.notifyDataSetChanged()
+                updatePendingTours(list)
             },
             onError = {
-                Toast.makeText(this, "שגיאה בטעינת מסלולים", Toast.LENGTH_SHORT).show()
+                showToast(AdminMessageFormatter.loadError())
             }
         )
     }
 
-    private fun updateTourStatus(tourId: String, isApproved: Boolean, position: Int) {
-        val newStatus = if (isApproved) "approved" else "rejected"
+    private fun updatePendingTours(list: List<Tour>) {
+        pendingList.clear()
+        pendingList.addAll(list)
+        adapter.notifyDataSetChanged()
+    }
 
-        toursRepo.updateStatus(
+    private fun updateTourStatus(tourId: String, newStatus: String, position: Int) {
+        updateTourStatusUseCase(
             tourId = tourId,
             newStatus = newStatus,
             onSuccess = {
-                Toast.makeText(this, "הסטטוס עודכן ל-$newStatus", Toast.LENGTH_SHORT).show()
-                adapter.removeAt(position)
+                showToast(AdminMessageFormatter.statusUpdated(newStatus))
+                removeTourFromList(position)
             },
             onError = {
-                Toast.makeText(this, "עדכון סטטוס נכשל", Toast.LENGTH_SHORT).show()
+                showToast(AdminMessageFormatter.updateFailed())
             }
         )
+    }
+
+    private fun removeTourFromList(position: Int) {
+        val removed = PendingToursUiHelper.removeAt(pendingList, position)
+        if (removed) {
+            adapter.notifyItemRemoved(position)
+        }
+    }
+
+    private fun showToast(message: String) {
+        Toast.makeText(this, message, Toast.LENGTH_SHORT).show()
     }
 }

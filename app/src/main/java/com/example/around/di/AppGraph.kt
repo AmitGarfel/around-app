@@ -10,8 +10,10 @@ import com.example.around.data.repositories.ToursRepository
 import com.example.around.data.repositories.UsersRepository
 import com.example.around.domain.usecases.AuthUseCase
 import com.example.around.domain.usecases.CreateTourUseCase
+import com.example.around.domain.usecases.GetPendingToursUseCase
 import com.example.around.domain.usecases.LoadTourStationsUseCase
 import com.example.around.domain.usecases.LoadToursWithLikesUseCase
+import com.example.around.domain.usecases.UpdateTourStatusUseCase
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.storage.FirebaseStorage
@@ -42,6 +44,14 @@ object AppGraph {
 
     val loadTourStationsUseCase: LoadTourStationsUseCase by lazy {
         LoadTourStationsUseCase(toursRepo)
+    }
+
+    val getPendingToursUseCase: GetPendingToursUseCase by lazy {
+        GetPendingToursUseCase(toursRepo)
+    }
+
+    val updateTourStatusUseCase: UpdateTourStatusUseCase by lazy {
+        UpdateTourStatusUseCase(toursRepo)
     }
 
     val authUseCase: AuthUseCase by lazy {

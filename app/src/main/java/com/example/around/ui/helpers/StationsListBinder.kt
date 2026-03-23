@@ -1,6 +1,4 @@
 package com.example.around.ui.helpers
-
-import android.view.View
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.example.around.domain.model.Station
