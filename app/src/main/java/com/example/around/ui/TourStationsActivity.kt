@@ -11,7 +11,6 @@ import android.widget.Spinner
 import android.widget.TextView
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
-import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.example.around.R
 import com.example.around.data.geo.GeocodingRepository
@@ -22,6 +21,7 @@ import com.example.around.domain.model.Station
 import com.example.around.ui.formatters.TourStationsUiFormatter
 import com.example.around.ui.helpers.StationMapResolver
 import com.example.around.ui.helpers.StationNavigator
+import com.example.around.ui.helpers.StationsListBinder
 import com.example.around.ui.helpers.TourProgressManager
 import com.example.around.ui.helpers.TravelModeMapper
 import com.example.around.util.NavigationKeys
@@ -41,6 +41,7 @@ class TourStationsActivity : AppCompatActivity(), OnMapReadyCallback {
     private lateinit var gMap: GoogleMap
 
     private val loadTourStationsUseCase = AppGraph.loadTourStationsUseCase
+    private val stationsListBinder = StationsListBinder()
 
     private lateinit var geocodingRepo: GeocodingRepository
     private lateinit var navRepo: MapsNavigationRepository
@@ -201,14 +202,15 @@ class TourStationsActivity : AppCompatActivity(), OnMapReadyCallback {
 
     private fun setupStationsList(stations: List<Station>) {
         val rv = findViewById<RecyclerView>(R.id.rvStations)
-        rv.layoutManager = LinearLayoutManager(this)
-        rv.isNestedScrollingEnabled = false
 
-        stationsAdapter = StationsAdapter(stations) { station ->
-            navigateToStation(station)
-        }
+        stationsAdapter = stationsListBinder.bind(
+            recyclerView = rv,
+            stations = stations,
+            onStationClick = { station ->
+                navigateToStation(station)
+            }
+        )
 
-        rv.adapter = stationsAdapter
         stationsAdapter.updateCurrentStation(progressManager?.currentIndex() ?: 0)
 
         findViewById<View>(R.id.btnNavigate).setOnClickListener {
