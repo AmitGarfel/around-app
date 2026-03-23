@@ -12,9 +12,11 @@ import android.widget.TextView
 import androidx.core.app.ActivityCompat
 import com.example.around.R
 import com.example.around.data.geo.LocationHelper
+import com.example.around.data.preferences.UserPrefsProvider
 import com.example.around.di.AppGraph
 import com.example.around.ui.base.BaseActivity
-import com.example.around.util.NavigationKeys
+import com.example.around.ui.formatters.MenuQuickInfoFormatter
+import com.example.around.ui.helpers.MenuNavigationHelper
 
 class MenuActivity : BaseActivity() {
 
@@ -23,6 +25,7 @@ class MenuActivity : BaseActivity() {
 
     private lateinit var tvQuickInfo: TextView
     private lateinit var locationHelper: LocationHelper
+    private lateinit var userPrefs: UserPrefsProvider
 
     private var detectedCity: String = "Tel Aviv"
 
@@ -46,6 +49,10 @@ class MenuActivity : BaseActivity() {
 
         tvQuickInfo = findViewById(R.id.tvQuickInfo)
         locationHelper = LocationHelper(this)
+        userPrefs = UserPrefsProvider(this)
+
+        detectedCity = userPrefs.getLastCity()
+        tvQuickInfo.text = MenuQuickInfoFormatter.build(detectedCity)
 
         val fadeIn = AnimationUtils.loadAnimation(this, R.anim.fade_in)
         mainLayout.startAnimation(fadeIn)
@@ -60,14 +67,11 @@ class MenuActivity : BaseActivity() {
         val uid = auth.currentUser?.uid ?: return
         checkAdminStatus(uid, layoutRegularActions, layoutAdminActions)
 
-        btnCreateRegular.setOnClickListener { openCreate() }
-        btnExploreRegular.setOnClickListener { openExplore() }
-        btnCreateAdmin.setOnClickListener { openCreate() }
-        btnExploreAdmin.setOnClickListener { openExplore() }
-
-        btnAdmin.setOnClickListener {
-            startActivity(Intent(this, AdminActivity::class.java))
-        }
+        bindCreateClick(btnCreateRegular)
+        bindExploreClick(btnExploreRegular)
+        bindCreateClick(btnCreateAdmin)
+        bindExploreClick(btnExploreAdmin)
+        bindAdminClick(btnAdmin)
     }
 
     override fun onResume() {
@@ -75,15 +79,22 @@ class MenuActivity : BaseActivity() {
         refreshBottomNavSelection(R.id.nav_menu)
     }
 
-    private fun openCreate() {
-        startActivity(Intent(this, CreateTourActivity::class.java))
+    private fun bindCreateClick(button: ImageButton) {
+        button.setOnClickListener {
+            MenuNavigationHelper.openCreate(this)
+        }
     }
 
-    private fun openExplore() {
-        val intent = Intent(this, HomeActivity::class.java)
-        intent.putExtra(NavigationKeys.EXTRA_CITY, detectedCity)
-        startActivity(intent)
-        overridePendingTransition(0, 0)
+    private fun bindExploreClick(button: ImageButton) {
+        button.setOnClickListener {
+            MenuNavigationHelper.openExplore(this, detectedCity)
+        }
+    }
+
+    private fun bindAdminClick(button: ImageButton) {
+        button.setOnClickListener {
+            MenuNavigationHelper.openAdmin(this)
+        }
     }
 
     private fun checkLocationPermission() {
@@ -96,7 +107,7 @@ class MenuActivity : BaseActivity() {
             ActivityCompat.requestPermissions(
                 this,
                 arrayOf(Manifest.permission.ACCESS_FINE_LOCATION),
-                100
+                LOCATION_PERMISSION_REQUEST_CODE
             )
         }
     }
@@ -104,16 +115,15 @@ class MenuActivity : BaseActivity() {
     private fun fetchCity() {
         locationHelper.getCityName { cityName ->
             runOnUiThread {
-                detectedCity = cityName
-
-                getSharedPreferences("around_prefs", MODE_PRIVATE)
-                    .edit()
-                    .putString("last_detected_city", cityName)
-                    .apply()
-
-                tvQuickInfo.text = "Near you: $cityName Tours"
+                applyDetectedCity(cityName)
             }
         }
+    }
+
+    private fun applyDetectedCity(cityName: String) {
+        detectedCity = cityName
+        userPrefs.saveLastCity(cityName)
+        tvQuickInfo.text = MenuQuickInfoFormatter.build(cityName)
     }
 
     override fun onRequestPermissionsResult(
@@ -122,9 +132,15 @@ class MenuActivity : BaseActivity() {
         grantResults: IntArray
     ) {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults)
+        handleLocationPermissionResult(requestCode, grantResults)
+    }
 
+    private fun handleLocationPermissionResult(
+        requestCode: Int,
+        grantResults: IntArray
+    ) {
         if (
-            requestCode == 100 &&
+            requestCode == LOCATION_PERMISSION_REQUEST_CODE &&
             grantResults.isNotEmpty() &&
             grantResults[0] == PackageManager.PERMISSION_GRANTED
         ) {
@@ -155,5 +171,9 @@ class MenuActivity : BaseActivity() {
         intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
         startActivity(intent)
         finish()
+    }
+
+    companion object {
+        private const val LOCATION_PERMISSION_REQUEST_CODE = 100
     }
 }

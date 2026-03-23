@@ -18,6 +18,8 @@ import com.example.around.di.AppGraph
 import com.example.around.domain.model.Station
 import com.example.around.domain.model.Tour
 import com.example.around.ui.base.BaseActivity
+import com.example.around.ui.helpers.CreateTourDurationHelper
+import com.example.around.ui.helpers.CreateTourHelper
 import com.example.around.util.CityNormalizer
 import com.google.android.gms.maps.model.LatLng
 import com.google.android.libraries.places.api.Places
@@ -248,7 +250,6 @@ class CreateTourActivity : BaseActivity() {
             }
         }
     }
-
     private fun updateStationField(index: Int, value: String) {
         val id = when (index) {
             0 -> R.id.etStation1
@@ -263,32 +264,22 @@ class CreateTourActivity : BaseActivity() {
     }
 
     private fun updateDurationDefault() {
-        val stationsCount = countFilledStations()
-        val durationSpinner = findViewById<Spinner>(R.id.spinnerDuration)
-
-        val suggested = when (stationsCount) {
-            0, 1, 2 -> "30–60 min"
-            3, 4 -> "1–1.5 hours"
-            else -> "1.5–2 hours"
-        }
-
-        val options = resources.getStringArray(R.array.duration_options)
-        val index = options.indexOf(suggested)
-        if (index >= 0) {
-            durationSpinner.setSelection(index)
-        }
-    }
-
-    private fun countFilledStations(): Int {
-        val ids = listOf(
-            R.id.etStation1,
-            R.id.etStation2,
-            R.id.etStation3,
-            R.id.etStation4
+        val stationTexts = listOf(
+            findViewById<EditText>(R.id.etStation1).text.toString(),
+            findViewById<EditText>(R.id.etStation2).text.toString(),
+            findViewById<EditText>(R.id.etStation3).text.toString(),
+            findViewById<EditText>(R.id.etStation4).text.toString()
         )
 
-        return ids.count { id ->
-            findViewById<EditText>(id).text.toString().trim().isNotEmpty()
+        val stationsCount = CreateTourDurationHelper.countFilledStations(stationTexts)
+        val suggested = CreateTourDurationHelper.suggestDuration(stationsCount)
+
+        val durationSpinner = findViewById<Spinner>(R.id.spinnerDuration)
+        val options = resources.getStringArray(R.array.duration_options)
+        val index = options.indexOf(suggested)
+
+        if (index >= 0) {
+            durationSpinner.setSelection(index)
         }
     }
 
@@ -302,8 +293,9 @@ class CreateTourActivity : BaseActivity() {
         val timeFit = findViewById<Spinner>(R.id.spinnerTimeFit).selectedItem.toString().trim()
         val estimatedDuration = findViewById<Spinner>(R.id.spinnerDuration).selectedItem.toString().trim()
 
-        if (tourName.isBlank() || city.isBlank()) {
-            Toast.makeText(this, "Please enter a name and city", Toast.LENGTH_SHORT).show()
+        val basicError = CreateTourHelper.validateBasicFields(tourName, city)
+        if (basicError != null) {
+            Toast.makeText(this, basicError, Toast.LENGTH_SHORT).show()
             return
         }
 
@@ -340,26 +332,24 @@ class CreateTourActivity : BaseActivity() {
             }
         }
 
-        if (stationsList.size < 2) {
-            Toast.makeText(this, "Please add at least 2 stations", Toast.LENGTH_SHORT).show()
+        val stationsError = CreateTourHelper.validateStations(stationsList)
+        if (stationsError != null) {
+            Toast.makeText(this, stationsError, Toast.LENGTH_SHORT).show()
             return
         }
 
         val uid = AppGraph.auth.currentUser?.uid ?: ""
 
         lifecycleScope.launch {
-            val newTour = Tour(
+            val newTour = CreateTourHelper.buildTour(
                 name = tourName,
                 city = city,
                 description = description,
                 mood = mood,
                 timeTag = timeFit,
-                estimatedDuration = estimatedDuration,
-                status = "pending",
+                duration = estimatedDuration,
                 stations = stationsList,
-                startLatitude = stationsList.first().latitude,
-                startLongitude = stationsList.first().longitude,
-                createdBy = uid
+                uid = uid
             )
 
             createTourUseCase.createTour(

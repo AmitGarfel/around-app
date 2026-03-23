@@ -10,6 +10,8 @@ import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
 import com.example.around.R
 import com.example.around.domain.model.Tour
+import com.example.around.ui.formatters.TourUiFormatter
+import com.example.around.ui.helpers.TourLikeUiHelper
 
 class TourAdapter(
     private var tourList: List<Tour>,
@@ -36,11 +38,7 @@ class TourAdapter(
 
         holder.name.text = tour.name
         holder.likes.text = tour.likesCount.toString()
-
-        val duration = if (tour.estimatedDuration.isNotBlank()) tour.estimatedDuration else "—"
-        val stationsText =
-            if (tour.stations.isEmpty()) "no stations" else "${tour.stations.size} stations"
-        holder.details.text = "$duration • $stationsText"
+        holder.details.text = TourUiFormatter.buildDetails(tour)
 
         Glide.with(context)
             .load(tour.imageUrl)
@@ -48,30 +46,22 @@ class TourAdapter(
             .error(android.R.drawable.stat_notify_error)
             .into(holder.image)
 
-        // ✅ מצב לייק מהאובייקט
         updateLikeUI(holder.btnLike, tour.isLikedByMe)
 
         holder.btnLike.setOnClickListener {
-
-            // ✅ מונע לחיצות כפולות בזמן בקשה
             holder.btnLike.isEnabled = false
 
-            val prevLiked = tour.isLikedByMe
-            val prevCount = tour.likesCount
-
-            // ✅ עדכון אופטימי (UI מיידי)
-            tour.isLikedByMe = !tour.isLikedByMe
-            val newCount =
-                if (tour.isLikedByMe) prevCount + 1 else (prevCount - 1).coerceAtLeast(0)
-            tour.likesCount = newCount
+            val previousState = TourLikeUiHelper.applyOptimisticToggle(tour)
 
             updateLikeUI(holder.btnLike, tour.isLikedByMe)
             holder.likes.text = tour.likesCount.toString()
 
-            // ✅ עכשיו Activity מטפל בשרת
-            onLikeClick(tour, prevLiked, prevCount) {
+            onLikeClick(
+                tour,
+                previousState.wasLiked,
+                previousState.likesCount
+            ) {
                 holder.btnLike.isEnabled = true
-                // ליתר ביטחון נרענן UI לפי הנתונים הסופיים באובייקט
                 updateLikeUI(holder.btnLike, tour.isLikedByMe)
                 holder.likes.text = tour.likesCount.toString()
             }
@@ -88,7 +78,9 @@ class TourAdapter(
     }
 
     private fun updateLikeUI(imageView: ImageView, isLiked: Boolean) {
-        imageView.setImageResource(if (isLiked) R.drawable.heart_full else R.drawable.heart_outline)
+        imageView.setImageResource(
+            if (isLiked) R.drawable.heart_full else R.drawable.heart_outline
+        )
     }
 
     override fun getItemCount(): Int = tourList.size

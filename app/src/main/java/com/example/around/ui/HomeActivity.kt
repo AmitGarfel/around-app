@@ -9,13 +9,19 @@ import android.widget.LinearLayout
 import android.widget.Spinner
 import android.widget.TextView
 import com.example.around.R
+import com.example.around.data.preferences.UserPrefsProvider
 import com.example.around.di.AppGraph
 import com.example.around.ui.base.BaseActivity
+import com.example.around.ui.formatters.HomeGreetingFormatter
+import com.example.around.ui.providers.HomeArgsProvider
+import com.example.around.ui.providers.HomeSelectionProvider
+import com.example.around.ui.providers.TimeContextProvider
 import com.example.around.util.CityNormalizer
 import com.example.around.util.NavigationKeys
-import java.util.Calendar
 
 class HomeActivity : BaseActivity() {
+
+    private lateinit var userPrefs: UserPrefsProvider
 
     private var detectedCity: String = "Tel Aviv"
 
@@ -29,15 +35,10 @@ class HomeActivity : BaseActivity() {
         val timeSpinner = findViewById<Spinner>(R.id.spinnerTimeOverride)
         val citySpinner = findViewById<Spinner>(R.id.spinnerCityOverride)
 
-        val savedCity = getSharedPreferences("around_prefs", MODE_PRIVATE)
-            .getString("last_detected_city", "Tel Aviv")
-            .orEmpty()
+        userPrefs = UserPrefsProvider(this)
+        detectedCity = HomeArgsProvider.resolveCity(intent, userPrefs)
 
-        detectedCity = CityNormalizer.canonical(
-            intent.getStringExtra(NavigationKeys.EXTRA_CITY) ?: savedCity
-        )
-
-        val autoTimeContext = getAutomaticTimeContext()
+        val autoTimeContext = TimeContextProvider.getAutomaticTimeContext()
 
         setupGreeting(greetingTv, autoTimeContext)
         setupGridAnimation()
@@ -61,21 +62,9 @@ class HomeActivity : BaseActivity() {
     }
 
     private fun setupGreeting(greetingTv: TextView, autoTimeContext: String) {
-        val emoji = when (autoTimeContext) {
-            "Morning" -> "☀️"
-            "Afternoon" -> "🌤️"
-            else -> "🌙"
-        }
-
         AppGraph.authUseCase.getCurrentUserFirstName { firstName ->
             runOnUiThread {
-                val safeName = if (firstName.isNullOrBlank()) "there" else firstName
-
-                greetingTv.text = when (autoTimeContext) {
-                    "Morning" -> "Good morning, $safeName $emoji"
-                    "Afternoon" -> "Good afternoon, $safeName $emoji"
-                    else -> "Good evening, $safeName $emoji"
-                }
+                greetingTv.text = HomeGreetingFormatter.buildGreeting(firstName, autoTimeContext)
             }
         }
     }
@@ -88,15 +77,6 @@ class HomeActivity : BaseActivity() {
                 startOffset = (i * 80).toLong()
             }
             child.startAnimation(anim)
-        }
-    }
-
-    private fun getAutomaticTimeContext(): String {
-        val hour = Calendar.getInstance().get(Calendar.HOUR_OF_DAY)
-        return when (hour) {
-            in 5..11 -> "Morning"
-            in 12..17 -> "Afternoon"
-            else -> "Evening"
         }
     }
 
@@ -128,34 +108,27 @@ class HomeActivity : BaseActivity() {
     }
 
     private fun setupMoodButtons(timeSpinner: Spinner, citySpinner: Spinner) {
-        fun selectedTime(): String {
-            return timeSpinner.selectedItem?.toString() ?: getAutomaticTimeContext()
-        }
+        bindMoodClick(R.id.moodFoody, "culinary", timeSpinner, citySpinner)
+        bindMoodClick(R.id.moodCulture, "culture", timeSpinner, citySpinner)
+        bindMoodClick(R.id.moodRelax, "relax", timeSpinner, citySpinner)
+        bindMoodClick(R.id.moodSurprise, "surprise", timeSpinner, citySpinner)
+    }
 
-        fun selectedCity(): String {
-            val selected = citySpinner.selectedItem?.toString()?.trim().orEmpty()
-
-            return if (selected.startsWith("Near me", ignoreCase = true) || selected.isBlank()) {
-                detectedCity
-            } else {
-                CityNormalizer.canonical(selected)
-            }
-        }
-
-        findViewById<LinearLayout>(R.id.moodFoody).setOnClickListener {
-            openTourList("culinary", selectedTime(), selectedCity())
-        }
-
-        findViewById<LinearLayout>(R.id.moodCulture).setOnClickListener {
-            openTourList("culture", selectedTime(), selectedCity())
-        }
-
-        findViewById<LinearLayout>(R.id.moodRelax).setOnClickListener {
-            openTourList("relax", selectedTime(), selectedCity())
-        }
-
-        findViewById<LinearLayout>(R.id.moodSurprise).setOnClickListener {
-            openTourList("surprise", selectedTime(), selectedCity())
+    private fun bindMoodClick(
+        viewId: Int,
+        mood: String,
+        timeSpinner: Spinner,
+        citySpinner: Spinner
+    ) {
+        findViewById<LinearLayout>(viewId).setOnClickListener {
+            openTourList(
+                mood,
+                HomeSelectionProvider.resolveSelectedTime(
+                    timeSpinner,
+                    TimeContextProvider.getAutomaticTimeContext()
+                ),
+                HomeSelectionProvider.resolveSelectedCity(citySpinner, detectedCity)
+            )
         }
     }
 
