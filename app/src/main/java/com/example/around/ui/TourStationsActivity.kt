@@ -1,7 +1,6 @@
 package com.example.around.ui
 
 import android.os.Bundle
-import android.util.Log
 import android.view.MotionEvent
 import android.view.View
 import android.widget.AdapterView
@@ -21,11 +20,11 @@ import com.example.around.data.geo.MapsNavigationRepository
 import com.example.around.di.AppGraph
 import com.example.around.domain.model.Station
 import com.example.around.ui.formatters.TourStationsUiFormatter
+import com.example.around.ui.helpers.StationMapResolver
 import com.example.around.ui.helpers.StationNavigator
 import com.example.around.ui.helpers.TourProgressManager
 import com.example.around.ui.helpers.TravelModeMapper
 import com.example.around.util.NavigationKeys
-import com.example.around.util.PlaceQueryBuilder
 import com.google.android.gms.maps.GoogleMap
 import com.google.android.gms.maps.OnMapReadyCallback
 import com.google.android.gms.maps.SupportMapFragment
@@ -46,6 +45,7 @@ class TourStationsActivity : AppCompatActivity(), OnMapReadyCallback {
     private lateinit var geocodingRepo: GeocodingRepository
     private lateinit var navRepo: MapsNavigationRepository
     private lateinit var stationNavigator: StationNavigator
+    private lateinit var stationMapResolver: StationMapResolver
     private lateinit var stationsAdapter: StationsAdapter
 
     private var mapRenderer: MapRenderer? = null
@@ -70,6 +70,7 @@ class TourStationsActivity : AppCompatActivity(), OnMapReadyCallback {
         geocodingRepo = AppGraph.geocodingRepo(this)
         navRepo = AppGraph.mapsNavRepo(this)
         stationNavigator = StationNavigator(navRepo)
+        stationMapResolver = StationMapResolver(geocodingRepo)
 
         setupBackButton()
         setupMapTouchInScroll()
@@ -228,42 +229,17 @@ class TourStationsActivity : AppCompatActivity(), OnMapReadyCallback {
         isResolving = true
 
         ioScope.launch {
-            for (i in stations.indices) {
-                val station = stations[i]
-
-                resolvedPositions[i] = if (hasSavedCoordinates(station)) {
-                    LatLng(station.latitude, station.longitude)
-                } else {
-                    geocodeStation(station)
-                }
-
-                Log.d("MAP_DEBUG", "Resolved ${station.name} -> ${resolvedPositions[i]}")
-            }
+            val positions = stationMapResolver.resolveAll(
+                stations = stations,
+                city = tourCity
+            )
 
             withContext(Dispatchers.Main) {
+                resolvedPositions = positions.toMutableList()
                 renderer.renderStations(stations, resolvedPositions)
                 isResolving = false
             }
         }
-    }
-
-    private fun hasSavedCoordinates(station: Station): Boolean {
-        return station.latitude != 0.0 && station.longitude != 0.0
-    }
-
-    private suspend fun geocodeStation(station: Station): LatLng? {
-        if (hasSavedCoordinates(station)) {
-            return LatLng(station.latitude, station.longitude)
-        }
-
-        val queryText = PlaceQueryBuilder.build(station, tourCity)
-        if (queryText.isBlank()) {
-            Log.d("MAP_DEBUG", "Blank query for ${station.name}")
-            return null
-        }
-
-        Log.d("MAP_DEBUG", "Geocoding query for ${station.name}: $queryText")
-        return geocodingRepo.geocode(queryText)
     }
 
     private fun navigateToStation(station: Station) {
