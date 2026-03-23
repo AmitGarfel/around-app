@@ -21,6 +21,7 @@ import com.example.around.data.geo.MapsNavigationRepository
 import com.example.around.di.AppGraph
 import com.example.around.domain.model.Station
 import com.example.around.ui.formatters.TourStationsUiFormatter
+import com.example.around.ui.helpers.StationNavigator
 import com.example.around.ui.helpers.TourProgressManager
 import com.example.around.ui.helpers.TravelModeMapper
 import com.example.around.util.NavigationKeys
@@ -41,8 +42,10 @@ class TourStationsActivity : AppCompatActivity(), OnMapReadyCallback {
     private lateinit var gMap: GoogleMap
 
     private val loadTourStationsUseCase = AppGraph.loadTourStationsUseCase
+
     private lateinit var geocodingRepo: GeocodingRepository
     private lateinit var navRepo: MapsNavigationRepository
+    private lateinit var stationNavigator: StationNavigator
     private lateinit var stationsAdapter: StationsAdapter
 
     private var mapRenderer: MapRenderer? = null
@@ -66,6 +69,7 @@ class TourStationsActivity : AppCompatActivity(), OnMapReadyCallback {
 
         geocodingRepo = AppGraph.geocodingRepo(this)
         navRepo = AppGraph.mapsNavRepo(this)
+        stationNavigator = StationNavigator(navRepo)
 
         setupBackButton()
         setupMapTouchInScroll()
@@ -263,38 +267,19 @@ class TourStationsActivity : AppCompatActivity(), OnMapReadyCallback {
     }
 
     private fun navigateToStation(station: Station) {
-        val searchText = PlaceQueryBuilder.build(station, tourCity)
+        val success = stationNavigator.navigate(
+            station = station,
+            city = tourCity,
+            travelMode = selectedTravelMode
+        )
 
-        if (selectedTravelMode.dirMode == "transit") {
-            if (searchText.isBlank()) {
-                Toast.makeText(
-                    this,
-                    TourStationsUiFormatter.destinationNotFound(),
-                    Toast.LENGTH_SHORT
-                ).show()
-                return
-            }
-
-            navRepo.openTransitDirections(searchText)
-            return
+        if (!success) {
+            Toast.makeText(
+                this,
+                TourStationsUiFormatter.destinationNotFound(),
+                Toast.LENGTH_SHORT
+            ).show()
         }
-
-        if (searchText.isNotBlank()) {
-            navRepo.navigateToSearchPlace(searchText, selectedTravelMode.navMode)
-            return
-        }
-
-        if (hasSavedCoordinates(station)) {
-            navRepo.navigateToLatLng(
-                latitude = station.latitude,
-                longitude = station.longitude,
-                label = station.name,
-                navMode = selectedTravelMode.navMode
-            )
-            return
-        }
-
-        Toast.makeText(this, "Destination not found", Toast.LENGTH_SHORT).show()
     }
 
     private fun navigateToStationByIndex(index: Int) {
