@@ -10,6 +10,7 @@ import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import com.example.around.R
 import com.example.around.di.AppGraph
+import com.example.around.ui.formatters.AuthMessageFormatter
 import com.example.around.ui.formatters.AuthUiFormatter
 import com.example.around.ui.helpers.AuthFormValidator
 import com.example.around.ui.models.AuthScreenMode
@@ -97,11 +98,19 @@ class MainActivity : AppCompatActivity() {
             email = email,
             password = password,
             onSuccess = {
-                Toast.makeText(this, "Welcome back!", Toast.LENGTH_SHORT).show()
+                Toast.makeText(
+                    this,
+                    AuthMessageFormatter.loginSuccess(),
+                    Toast.LENGTH_SHORT
+                ).show()
                 navigateToHome()
             },
             onError = { e ->
-                Toast.makeText(this, "Login failed: ${e.message}", Toast.LENGTH_LONG).show()
+                Toast.makeText(
+                    this,
+                    AuthMessageFormatter.loginFailed(e.message),
+                    Toast.LENGTH_LONG
+                ).show()
             }
         )
     }
@@ -132,11 +141,19 @@ class MainActivity : AppCompatActivity() {
             email = email,
             password = password,
             onSuccess = {
-                Toast.makeText(this, "Account created successfully!", Toast.LENGTH_SHORT).show()
+                Toast.makeText(
+                    this,
+                    AuthMessageFormatter.registerSuccess(),
+                    Toast.LENGTH_SHORT
+                ).show()
                 navigateToHome()
             },
             onError = { e ->
-                Toast.makeText(this, "Registration failed: ${e.message}", Toast.LENGTH_LONG).show()
+                Toast.makeText(
+                    this,
+                    AuthMessageFormatter.registerFailed(e.message),
+                    Toast.LENGTH_LONG
+                ).show()
             }
         )
     }
