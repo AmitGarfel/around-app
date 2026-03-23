@@ -1,6 +1,5 @@
 package com.example.around.ui
 
-import android.content.Intent
 import android.os.Bundle
 import android.view.View
 import android.widget.Button
@@ -13,6 +12,7 @@ import com.example.around.di.AppGraph
 import com.example.around.ui.formatters.AuthMessageFormatter
 import com.example.around.ui.formatters.AuthUiFormatter
 import com.example.around.ui.helpers.AuthFormValidator
+import com.example.around.ui.helpers.AuthNavigationHelper
 import com.example.around.ui.models.AuthScreenMode
 
 class MainActivity : AppCompatActivity() {
@@ -36,7 +36,7 @@ class MainActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
 
         if (authUseCase.isLoggedIn()) {
-            navigateToHome()
+            AuthNavigationHelper.openHome(this)
             return
         }
 
@@ -103,7 +103,7 @@ class MainActivity : AppCompatActivity() {
                     AuthMessageFormatter.loginSuccess(),
                     Toast.LENGTH_SHORT
                 ).show()
-                navigateToHome()
+                AuthNavigationHelper.openHome(this)
             },
             onError = { e ->
                 Toast.makeText(
@@ -146,7 +146,7 @@ class MainActivity : AppCompatActivity() {
                     AuthMessageFormatter.registerSuccess(),
                     Toast.LENGTH_SHORT
                 ).show()
-                navigateToHome()
+                AuthNavigationHelper.openHome(this)
             },
             onError = { e ->
                 Toast.makeText(
@@ -156,11 +156,5 @@ class MainActivity : AppCompatActivity() {
                 ).show()
             }
         )
-    }
-
-    private fun navigateToHome() {
-        val intent = Intent(this, MenuActivity::class.java)
-        startActivity(intent)
-        finish()
     }
 }
