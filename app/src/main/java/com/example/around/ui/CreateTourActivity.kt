@@ -16,14 +16,11 @@ import androidx.lifecycle.lifecycleScope
 import com.example.around.R
 import com.example.around.di.AppGraph
 import com.example.around.ui.base.BaseActivity
-import com.example.around.ui.helpers.CreateTourDurationHelper
-import com.example.around.ui.helpers.CreateTourHelper
+import com.example.around.ui.helpers.CreateTourFormHelper
 import com.example.around.ui.helpers.CreateTourImageHelper
 import com.example.around.ui.helpers.CreateTourPlacesHelper
-import com.example.around.ui.helpers.CreateTourStationFieldsHelper
 import com.example.around.ui.helpers.StationSelectionManager
 import com.example.around.util.CityNormalizer
-import com.google.android.gms.maps.model.LatLng
 import com.google.android.libraries.places.api.Places
 import com.google.android.libraries.places.api.model.Place
 import com.google.android.libraries.places.widget.Autocomplete
@@ -44,7 +41,7 @@ class CreateTourActivity : BaseActivity() {
             if (uri != null) {
                 selectedImageUri = uri
                 CreateTourImageHelper.applyPreview(
-                    findViewById(R.id.ivPreview),
+                    findViewById<ImageView>(R.id.ivPreview),
                     uri
                 )
                 Toast.makeText(this, "Image selected successfully ✅", Toast.LENGTH_SHORT).show()
@@ -53,7 +50,6 @@ class CreateTourActivity : BaseActivity() {
 
     private val placePickerLauncher =
         registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
-
             when (result.resultCode) {
                 RESULT_OK -> {
                     if (result.data != null && activeStationIndex != -1) {
@@ -190,7 +186,7 @@ class CreateTourActivity : BaseActivity() {
     }
 
     private fun setupStationPickers() {
-        val ids = CreateTourStationFieldsHelper.stationFieldIds()
+        val ids = CreateTourFormHelper.stationFieldIds()
 
         ids.forEachIndexed { index, id ->
             val et = findViewById<EditText>(id)
@@ -241,18 +237,18 @@ class CreateTourActivity : BaseActivity() {
     }
 
     private fun updateStationField(index: Int, value: String) {
-        val id = CreateTourStationFieldsHelper.stationFieldIdAt(index) ?: return
+        val id = CreateTourFormHelper.stationFieldIdAt(index) ?: return
         findViewById<EditText>(id).setText(value)
         updateDurationDefault()
     }
 
     private fun updateDurationDefault() {
-        val stationTexts = CreateTourStationFieldsHelper.stationFieldIds().map { id ->
+        val stationTexts = CreateTourFormHelper.stationFieldIds().map { id ->
             findViewById<EditText>(id).text.toString()
         }
 
-        val stationsCount = CreateTourDurationHelper.countFilledStations(stationTexts)
-        val suggested = CreateTourDurationHelper.suggestDuration(stationsCount)
+        val stationsCount = CreateTourFormHelper.countFilledStations(stationTexts)
+        val suggested = CreateTourFormHelper.suggestDuration(stationsCount)
 
         val durationSpinner = findViewById<Spinner>(R.id.spinnerDuration)
         val options = resources.getStringArray(R.array.duration_options)
@@ -273,13 +269,13 @@ class CreateTourActivity : BaseActivity() {
         val timeFit = findViewById<Spinner>(R.id.spinnerTimeFit).selectedItem.toString().trim()
         val estimatedDuration = findViewById<Spinner>(R.id.spinnerDuration).selectedItem.toString().trim()
 
-        val basicError = CreateTourHelper.validateBasicFields(tourName, city)
+        val basicError = CreateTourFormHelper.validateBasicFields(tourName, city)
         if (basicError != null) {
             Toast.makeText(this, basicError, Toast.LENGTH_SHORT).show()
             return
         }
 
-        val ids = CreateTourStationFieldsHelper.stationFieldIds()
+        val ids = CreateTourFormHelper.stationFieldIds()
 
         ids.forEachIndexed { index, id ->
             val text = findViewById<EditText>(id).text.toString().trim()
@@ -296,7 +292,7 @@ class CreateTourActivity : BaseActivity() {
 
         val stationsList = stationManager.buildStationsList()
 
-        val stationsError = CreateTourHelper.validateStations(stationsList)
+        val stationsError = CreateTourFormHelper.validateStations(stationsList)
         if (stationsError != null) {
             Toast.makeText(this, stationsError, Toast.LENGTH_SHORT).show()
             return
@@ -305,7 +301,7 @@ class CreateTourActivity : BaseActivity() {
         val uid = AppGraph.auth.currentUser?.uid ?: ""
 
         lifecycleScope.launch {
-            val newTour = CreateTourHelper.buildTour(
+            val newTour = CreateTourFormHelper.buildTour(
                 name = tourName,
                 city = city,
                 description = description,

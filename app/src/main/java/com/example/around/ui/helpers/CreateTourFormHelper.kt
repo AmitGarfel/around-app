@@ -1,9 +1,11 @@
 package com.example.around.ui.helpers
 
+import com.example.around.R
 import com.example.around.domain.model.Station
 import com.example.around.domain.model.Tour
+import com.example.around.domain.model.TourStatus
 
-object CreateTourHelper {
+object CreateTourFormHelper {
 
     fun validateBasicFields(
         tourName: String,
@@ -39,11 +41,36 @@ object CreateTourHelper {
             mood = mood,
             timeTag = timeTag,
             estimatedDuration = duration,
-            status = "pending",
+            status = TourStatus.PENDING,
             stations = stations,
             startLatitude = stations.first().latitude,
             startLongitude = stations.first().longitude,
             createdBy = uid
         )
+    }
+
+    fun countFilledStations(values: List<String>): Int {
+        return values.count { it.trim().isNotEmpty() }
+    }
+
+    fun suggestDuration(stationsCount: Int): String {
+        return when (stationsCount) {
+            0, 1, 2 -> "30–60 min"
+            3, 4 -> "1–1.5 hours"
+            else -> "1.5–2 hours"
+        }
+    }
+
+    fun stationFieldIds(): List<Int> {
+        return listOf(
+            R.id.etStation1,
+            R.id.etStation2,
+            R.id.etStation3,
+            R.id.etStation4
+        )
+    }
+
+    fun stationFieldIdAt(index: Int): Int? {
+        return stationFieldIds().getOrNull(index)
     }
 }

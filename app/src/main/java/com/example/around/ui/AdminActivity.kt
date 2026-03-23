@@ -9,8 +9,7 @@ import com.example.around.di.AppGraph
 import com.example.around.domain.model.Tour
 import com.example.around.ui.base.BaseActivity
 import com.example.around.ui.formatters.AdminMessageFormatter
-import com.example.around.ui.helpers.AdminStatusMapper
-import com.example.around.ui.helpers.PendingToursUiHelper
+import com.example.around.ui.helpers.AdminToursHelper
 
 class AdminActivity : BaseActivity() {
 
@@ -42,12 +41,12 @@ class AdminActivity : BaseActivity() {
     }
 
     private fun handleTourAction(tourId: String, isApproved: Boolean) {
-        val position = PendingToursUiHelper.findPositionByTourId(pendingList, tourId)
+        val position = AdminToursHelper.findPositionByTourId(pendingList, tourId)
         if (position == -1) return
 
         updateTourStatus(
             tourId = tourId,
-            newStatus = AdminStatusMapper.toStatus(isApproved),
+            newStatus = AdminToursHelper.toStatus(isApproved),
             position = position
         )
     }
@@ -84,7 +83,7 @@ class AdminActivity : BaseActivity() {
     }
 
     private fun removeTourFromList(position: Int) {
-        val removed = PendingToursUiHelper.removeAt(pendingList, position)
+        val removed = AdminToursHelper.removeAt(pendingList, position)
         if (removed) {
             adapter.notifyItemRemoved(position)
         }
