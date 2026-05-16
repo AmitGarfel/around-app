@@ -53,3 +53,16 @@ and scalability.
 
 #Tech Stack
 Kotlin, Android SDK, Firebase (Authentication, Firestore, Storage), Google Maps SDK, Geocoding API, and Material Design components.
+# Screenshots
+
+## Home Screen
+![Home](screenshots/home.jpeg)
+
+## Culinary Route
+![Culinary](screenshots/culinary.jpeg)
+
+## Map Navigation
+![Map](screenshots/map.jpeg)
+
+## Main Menu
+![Menu](screenshots/menu%20(2).jpeg)
