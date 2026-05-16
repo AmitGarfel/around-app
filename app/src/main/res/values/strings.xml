@@ -37,7 +37,6 @@
         <item>3+ hours</item>
     </string-array>
 
-    <!-- res/values/strings.xml : add this array -->
     <string-array name="travel_modes">
         <item>Driving 🚗</item>
         <item>Walking 🚶</item>
@@ -45,6 +44,21 @@
         <item>Transit 🚆</item>
     </string-array>
 
+    <string name="admin_meta">%1$s • %2$s • %3$s</string>
+    <string name="admin_duration">%1$s • %2$s</string>
+    <string name="stations_count">%1$d stations</string>
+    <string name="no_stations">no stations</string>
 
+    <string name="station_number">Station %1$d</string>
+    <string name="current_station_badge">Current</string>
+    <string name="station_done_mark">✓</string>
+    <string name="station_index">%1$d</string>
+
+    <string name="stations_title">Stations</string>
+
+    <string name="routes_title">%1$s routes</string>
+    <string name="routes_subtitle">Perfect for %1$s in %2$s ✨</string>
+    <string name="error_fetching_tours">Error fetching tours: %1$s</string>
+    <string name="unknown_error">unknown error</string>
 
 </resources>

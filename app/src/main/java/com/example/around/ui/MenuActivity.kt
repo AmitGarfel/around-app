@@ -115,6 +115,7 @@ class MenuActivity : BaseActivity() {
     private fun fetchCity() {
         locationHelper.getCityName { cityName ->
             runOnUiThread {
+                // Ensure UI update on main thread
                 applyDetectedCity(cityName)
             }
         }
@@ -155,6 +156,7 @@ class MenuActivity : BaseActivity() {
     ) {
         usersRepo.isAdmin(uid) { isAdmin ->
             runOnUiThread {
+                // Toggle UI based on admin role
                 if (isAdmin) {
                     regularLayout.visibility = View.GONE
                     adminLayout.visibility = View.VISIBLE

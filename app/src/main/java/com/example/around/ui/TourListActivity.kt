@@ -51,9 +51,10 @@ class TourListActivity : BaseActivity() {
         recyclerView.layoutManager = LinearLayoutManager(this)
 
         findViewById<TextView>(R.id.listTitle).text =
-            mood.replaceFirstChar { it.uppercase() } + " routes"
+            getString(R.string.routes_title, mood.replaceFirstChar { it.uppercase() })
+
         findViewById<TextView>(R.id.listSubtitle).text =
-            "Perfect for $time in $selectedCity ✨"
+            getString(R.string.routes_subtitle, time, selectedCity)
 
         fetchTours()
     }
@@ -80,7 +81,10 @@ class TourListActivity : BaseActivity() {
             onError = { e ->
                 Toast.makeText(
                     this,
-                    "Error fetching tours: ${e.localizedMessage ?: "unknown error"}",
+                    getString(
+                        R.string.error_fetching_tours,
+                        e.localizedMessage ?: getString(R.string.unknown_error)
+                    ),
                     Toast.LENGTH_SHORT
                 ).show()
                 showTours(emptyList())

@@ -1,17 +1,19 @@
 package com.example.around.ui
 
+import android.graphics.Typeface
 import android.os.Bundle
 import android.view.MotionEvent
 import android.view.View
 import android.widget.AdapterView
 import android.widget.ArrayAdapter
 import android.widget.ImageButton
+import android.widget.LinearLayout
 import android.widget.ScrollView
 import android.widget.Spinner
 import android.widget.TextView
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
-import androidx.recyclerview.widget.RecyclerView
+import androidx.core.content.ContextCompat
 import com.example.around.R
 import com.example.around.data.geo.GeocodingRepository
 import com.example.around.data.geo.MapRenderer
@@ -21,7 +23,6 @@ import com.example.around.domain.model.Station
 import com.example.around.ui.formatters.TourStationsUiFormatter
 import com.example.around.ui.helpers.StationMapResolver
 import com.example.around.ui.helpers.StationNavigator
-import com.example.around.ui.helpers.StationsListBinder
 import com.example.around.ui.helpers.TourProgressManager
 import com.example.around.ui.helpers.TravelModeMapper
 import com.example.around.util.NavigationKeys
@@ -41,13 +42,11 @@ class TourStationsActivity : AppCompatActivity(), OnMapReadyCallback {
     private lateinit var gMap: GoogleMap
 
     private val loadTourStationsUseCase = AppGraph.loadTourStationsUseCase
-    private val stationsListBinder = StationsListBinder()
 
     private lateinit var geocodingRepo: GeocodingRepository
     private lateinit var navRepo: MapsNavigationRepository
     private lateinit var stationNavigator: StationNavigator
     private lateinit var stationMapResolver: StationMapResolver
-    private lateinit var stationsAdapter: StationsAdapter
 
     private var mapRenderer: MapRenderer? = null
 
@@ -125,7 +124,8 @@ class TourStationsActivity : AppCompatActivity(), OnMapReadyCallback {
         val scrollView = findViewById<ScrollView>(R.id.stationsScroll)
         val mapTouchLayer = findViewById<View>(R.id.mapTouchLayer)
 
-        mapTouchLayer.setOnTouchListener { _, event ->
+        // Allow map gestures inside ScrollView without blocking normal click handling
+        mapTouchLayer.setOnTouchListener { view, event ->
             when (event.actionMasked) {
                 MotionEvent.ACTION_DOWN,
                 MotionEvent.ACTION_MOVE,
@@ -134,7 +134,11 @@ class TourStationsActivity : AppCompatActivity(), OnMapReadyCallback {
                     scrollView.requestDisallowInterceptTouchEvent(true)
                 }
 
-                MotionEvent.ACTION_UP,
+                MotionEvent.ACTION_UP -> {
+                    scrollView.requestDisallowInterceptTouchEvent(false)
+                    view.performClick()
+                }
+
                 MotionEvent.ACTION_CANCEL -> {
                     scrollView.requestDisallowInterceptTouchEvent(false)
                 }
@@ -186,7 +190,7 @@ class TourStationsActivity : AppCompatActivity(), OnMapReadyCallback {
                 findViewById<TextView>(R.id.tvSubTitle).text =
                     TourStationsUiFormatter.buildSubtitle(tourCity)
 
-                setupStationsList(stations)
+                setupStationsList()
                 renderStationsOnMapIfReady()
             },
             onError = { e ->
@@ -200,26 +204,76 @@ class TourStationsActivity : AppCompatActivity(), OnMapReadyCallback {
         )
     }
 
-    private fun setupStationsList(stations: List<Station>) {
-        val rv = findViewById<RecyclerView>(R.id.rvStations)
-
-        stationsAdapter = stationsListBinder.bind(
-            recyclerView = rv,
-            stations = stations,
-            onStationClick = { station ->
-                navigateToStation(station)
-            }
-        )
-
-        stationsAdapter.updateCurrentStation(progressManager?.currentIndex() ?: 0)
+    private fun setupStationsList() {
+        renderStationsList(progressManager?.currentIndex() ?: 0)
 
         findViewById<View>(R.id.btnNavigate).setOnClickListener {
             navigateToStationByIndex(progressManager?.currentIndex() ?: 0)
         }
 
-        val btnNextStation = findViewById<View?>(R.id.btnNextStation)
-        btnNextStation?.setOnClickListener {
+        findViewById<View>(R.id.btnNextStation).setOnClickListener {
             moveToNextStation()
+        }
+    }
+
+    private fun renderStationsList(currentIndex: Int) {
+        val container = findViewById<LinearLayout>(R.id.stationsContainer)
+        container.removeAllViews()
+
+        stations.forEachIndexed { index, station ->
+            val itemView = layoutInflater.inflate(R.layout.item_station, container, false)
+
+            val leftIndicator = itemView.findViewById<View>(R.id.viewCurrentIndicator)
+            val tvIndex = itemView.findViewById<TextView>(R.id.tvStationIndex)
+            val tvName = itemView.findViewById<TextView>(R.id.tvStationName)
+            val tvBadge = itemView.findViewById<TextView>(R.id.tvStationBadge)
+
+            val isCurrent = index == currentIndex
+            val isPassed = index < currentIndex
+
+            tvName.text = station.name.ifBlank {
+                getString(R.string.station_number, index + 1)
+            }
+
+            when {
+                isCurrent -> {
+                    leftIndicator.visibility = View.VISIBLE
+                    tvIndex.text = getString(R.string.station_index, index + 1)
+                    tvIndex.setTextColor(ContextCompat.getColor(this, R.color.black))
+                    tvName.setTypeface(null, Typeface.BOLD)
+                    tvName.setTextColor(ContextCompat.getColor(this, R.color.black))
+                    tvBadge.visibility = View.VISIBLE
+                    tvBadge.text = getString(R.string.current_station_badge)
+                }
+
+                isPassed -> {
+                    leftIndicator.visibility = View.INVISIBLE
+                    tvIndex.text = getString(R.string.station_done_mark)
+                    tvIndex.setTextColor(
+                        ContextCompat.getColor(this, android.R.color.darker_gray)
+                    )
+                    tvName.setTypeface(null, Typeface.NORMAL)
+                    tvName.setTextColor(
+                        ContextCompat.getColor(this, android.R.color.darker_gray)
+                    )
+                    tvBadge.visibility = View.GONE
+                }
+
+                else -> {
+                    leftIndicator.visibility = View.INVISIBLE
+                    tvIndex.text = getString(R.string.station_index, index + 1)
+                    tvIndex.setTextColor(ContextCompat.getColor(this, R.color.black))
+                    tvName.setTypeface(null, Typeface.NORMAL)
+                    tvName.setTextColor(ContextCompat.getColor(this, R.color.black))
+                    tvBadge.visibility = View.GONE
+                }
+            }
+
+            itemView.setOnClickListener {
+                navigateToStation(station)
+            }
+
+            container.addView(itemView)
         }
     }
 
@@ -293,8 +347,7 @@ class TourStationsActivity : AppCompatActivity(), OnMapReadyCallback {
         if (moved) {
             val newIndex = manager.currentIndex()
 
-            stationsAdapter.updateCurrentStation(newIndex)
-            findViewById<RecyclerView>(R.id.rvStations).smoothScrollToPosition(newIndex)
+            renderStationsList(newIndex)
 
             val stationName = stations[newIndex].name
             Toast.makeText(

@@ -1,15 +1,16 @@
 package com.example.around.ui.base
 
 import android.content.Intent
-import android.os.Build
 import android.view.View
 import androidx.appcompat.app.AppCompatActivity
-import androidx.core.view.ViewCompat
+import androidx.core.content.ContextCompat
 import com.example.around.R
 import com.example.around.ui.HomeActivity
 import com.example.around.ui.MenuActivity
 import com.example.around.ui.SettingsActivity
+import com.example.around.util.NavigationKeys
 import com.google.android.material.bottomnavigation.BottomNavigationView
+import com.google.firebase.auth.FirebaseAuth
 
 abstract class BaseActivity : AppCompatActivity() {
 
@@ -33,7 +34,7 @@ abstract class BaseActivity : AppCompatActivity() {
                             addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_SINGLE_TOP)
                         }
                         startActivity(intent)
-                        overridePendingTransition(0, 0)
+                        applyNoAnimationTransition()
                     }
                     true
                 }
@@ -45,12 +46,12 @@ abstract class BaseActivity : AppCompatActivity() {
                             .orEmpty()
 
                         val intent = Intent(this, HomeActivity::class.java).apply {
-                            putExtra(com.example.around.util.NavigationKeys.EXTRA_CITY, savedCity)
+                            putExtra(NavigationKeys.EXTRA_CITY, savedCity)
                             addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_SINGLE_TOP)
                         }
 
                         startActivity(intent)
-                        overridePendingTransition(0, 0)
+                        applyNoAnimationTransition()
                     }
                     true
                 }
@@ -58,7 +59,7 @@ abstract class BaseActivity : AppCompatActivity() {
                 R.id.nav_settings -> {
                     if (this !is SettingsActivity) {
                         startActivity(Intent(this, SettingsActivity::class.java))
-                        overridePendingTransition(0, 0)
+                        applyNoAnimationTransition()
                     }
                     true
                 }
@@ -68,7 +69,7 @@ abstract class BaseActivity : AppCompatActivity() {
         }
 
         bottomNav.setOnItemReselectedListener {
-            // do nothing
+            // No action on reselect
         }
 
         refreshBottomNavSelection(selectedItemId)
@@ -86,29 +87,19 @@ abstract class BaseActivity : AppCompatActivity() {
     }
 
     private fun styleBottomNav(bottomNav: BottomNavigationView) {
-        ViewCompat.setLayoutDirection(bottomNav, ViewCompat.LAYOUT_DIRECTION_LTR)
+        bottomNav.layoutDirection = View.LAYOUT_DIRECTION_LTR
 
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-            bottomNav.itemIconTintList = getColorStateList(R.color.bottom_nav_item_colors)
-            bottomNav.itemTextColor = getColorStateList(R.color.bottom_nav_item_colors)
-        } else {
-            @Suppress("DEPRECATION")
-            run {
-                bottomNav.itemIconTintList =
-                    resources.getColorStateList(R.color.bottom_nav_item_colors)
-                bottomNav.itemTextColor =
-                    resources.getColorStateList(R.color.bottom_nav_item_colors)
-            }
-        }
+        val colors = ContextCompat.getColorStateList(this, R.color.bottom_nav_item_colors)
+        bottomNav.itemIconTintList = colors
+        bottomNav.itemTextColor = colors
     }
 
-    protected fun forceLtr(view: View?) {
-        view ?: return
-        ViewCompat.setLayoutDirection(view, ViewCompat.LAYOUT_DIRECTION_LTR)
+    private fun applyNoAnimationTransition() {
+        @Suppress("DEPRECATION")
+        overridePendingTransition(0, 0)
     }
 
     protected fun isUserLoggedIn(): Boolean {
-        val user = com.google.firebase.auth.FirebaseAuth.getInstance().currentUser
-        return user != null
+        return FirebaseAuth.getInstance().currentUser != null
     }
 }

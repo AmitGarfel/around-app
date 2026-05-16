@@ -23,8 +23,13 @@ object AuthModeUiBinder {
         switchModeText.text = ui.switchText
         actionButton.text = ui.actionText
 
-        firstNameInput.visibility = if (ui.showNameFields) View.VISIBLE else View.GONE
-        lastNameInput.visibility = if (ui.showNameFields) View.VISIBLE else View.GONE
-        confirmPasswordInput.visibility = if (ui.showConfirmPassword) View.VISIBLE else View.GONE
+        firstNameInput.setVisible(ui.showNameFields)
+        lastNameInput.setVisible(ui.showNameFields)
+        confirmPasswordInput.setVisible(ui.showConfirmPassword)
+    }
+
+    // Toggles view visibility based on flag
+    private fun View.setVisible(isVisible: Boolean) {
+        visibility = if (isVisible) View.VISIBLE else View.GONE
     }
 }

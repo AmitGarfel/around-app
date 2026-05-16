@@ -2,6 +2,7 @@ package com.example.around.ui.formatters
 
 import com.example.around.ui.models.AuthScreenMode
 
+// Maps auth screen mode to UI configuration
 object AuthUiFormatter {
 
     data class AuthModeUi(
@@ -13,8 +14,8 @@ object AuthUiFormatter {
         val showConfirmPassword: Boolean
     )
 
-    fun build(mode: AuthScreenMode): AuthModeUi {
-        return when (mode) {
+    fun build(mode: AuthScreenMode): AuthModeUi =
+        when (mode) {
             AuthScreenMode.LOGIN -> AuthModeUi(
                 title = "Welcome back",
                 subtitle = "Log in to continue exploring routes around you",
@@ -33,5 +34,4 @@ object AuthUiFormatter {
                 showConfirmPassword = true
             )
         }
-    }
 }

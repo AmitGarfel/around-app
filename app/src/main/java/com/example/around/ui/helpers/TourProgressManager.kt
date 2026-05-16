@@ -5,32 +5,20 @@ class TourProgressManager(
 ) {
     private var currentIndex: Int = 0
 
-    fun currentIndex(): Int {
-        return currentIndex
-    }
+    fun currentIndex(): Int = currentIndex
 
-    fun hasStations(): Boolean {
-        return totalStations > 0
-    }
+    fun hasStations(): Boolean = totalStations > 0
 
-    fun canMoveNext(): Boolean {
-        return currentIndex < totalStations - 1
-    }
+    fun canMoveNext(): Boolean = currentIndex < totalStations - 1
 
-    fun moveNext(): Boolean {
-        return if (canMoveNext()) {
+    fun moveNext(): Boolean =
+        if (canMoveNext()) {
             currentIndex++
             true
         } else {
             false
         }
-    }
 
-    fun reset() {
-        currentIndex = 0
-    }
-
-    fun isValidIndex(index: Int): Boolean {
-        return index in 0 until totalStations
-    }
+    fun isValidIndex(index: Int): Boolean =
+        index in 0 until totalStations
 }

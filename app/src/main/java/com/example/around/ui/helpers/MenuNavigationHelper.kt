@@ -17,10 +17,15 @@ object MenuNavigationHelper {
         val intent = Intent(activity, HomeActivity::class.java)
         intent.putExtra(NavigationKeys.EXTRA_CITY, city)
         activity.startActivity(intent)
-        activity.overridePendingTransition(0, 0)
+        applyNoAnimation(activity)
     }
 
     fun openAdmin(activity: Activity) {
         activity.startActivity(Intent(activity, AdminActivity::class.java))
+    }
+
+    private fun applyNoAnimation(activity: Activity) {
+        @Suppress("DEPRECATION")
+        activity.overridePendingTransition(0, 0)
     }
 }

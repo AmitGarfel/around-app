@@ -45,8 +45,6 @@ class AuthUseCase(
 
     fun isLoggedIn(): Boolean = authRepo.currentUserId() != null
 
-    fun currentUserId(): String? = authRepo.currentUserId()
-
     fun getCurrentUserFirstName(
         onResult: (String?) -> Unit
     ) {

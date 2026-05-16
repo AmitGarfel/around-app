@@ -55,6 +55,7 @@ class TourAdapter(
         holder.btnLike.setOnClickListener {
             holder.btnLike.isEnabled = false
 
+            // Optimistic UI update before server confirmation
             val previousState = TourLikeUiHelper.applyOptimisticToggle(tour)
 
             updateLikeUI(holder.btnLike, tour.isLikedByMe)

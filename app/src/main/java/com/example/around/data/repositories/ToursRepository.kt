@@ -1,7 +1,6 @@
 package com.example.around.data.repositories
 
 import com.example.around.data.mappers.toTourSafe
-import com.example.around.domain.model.Station
 import com.example.around.domain.model.Tour
 import com.google.firebase.firestore.FirebaseFirestore
 
@@ -81,19 +80,6 @@ class ToursRepository(
 
                 onSuccess(doc.toTourSafe())
             }
-            .addOnFailureListener { onError(it) }
-    }
-
-    fun updateStations(
-        tourId: String,
-        updatedStations: List<Station>,
-        onSuccess: () -> Unit,
-        onError: (Exception) -> Unit
-    ) {
-        db.collection("Tours")
-            .document(tourId)
-            .update("stations", updatedStations)
-            .addOnSuccessListener { onSuccess() }
             .addOnFailureListener { onError(it) }
     }
 }

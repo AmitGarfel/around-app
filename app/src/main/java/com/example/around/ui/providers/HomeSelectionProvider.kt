@@ -8,9 +8,8 @@ object HomeSelectionProvider {
     fun resolveSelectedTime(
         timeSpinner: Spinner,
         fallbackTime: String
-    ): String {
-        return timeSpinner.selectedItem?.toString() ?: fallbackTime
-    }
+    ): String =
+        timeSpinner.selectedItem?.toString() ?: fallbackTime
 
     fun resolveSelectedCity(
         citySpinner: Spinner,

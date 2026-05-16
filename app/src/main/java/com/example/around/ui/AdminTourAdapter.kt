@@ -39,12 +39,27 @@ class AdminTourAdapter(
         val context = holder.itemView.context
 
         holder.name.text = tour.name
-        holder.meta.text = "${tour.city} • ${tour.mood} • ${tour.timeTag}"
+
+        holder.meta.text = context.getString(
+            R.string.admin_meta,
+            tour.city,
+            tour.mood,
+            tour.timeTag
+        )
 
         val durationText = tour.estimatedDuration.ifBlank { "—" }
         val stationsCount = tour.stations.size
-        val stationsText = if (stationsCount == 0) "no stations" else "$stationsCount stations"
-        holder.duration.text = "$durationText • $stationsText"
+        val stationsText = if (stationsCount == 0) {
+            context.getString(R.string.no_stations)
+        } else {
+            context.getString(R.string.stations_count, stationsCount)
+        }
+
+        holder.duration.text = context.getString(
+            R.string.admin_duration,
+            durationText,
+            stationsText
+        )
 
         holder.desc.text = tour.description.ifBlank { "No description" }
 

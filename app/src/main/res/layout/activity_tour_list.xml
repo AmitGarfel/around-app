@@ -29,7 +29,7 @@
         android:background="@android:color/transparent"
         android:contentDescription="Back"
         android:padding="8dp"
-        android:src="@android:drawable/ic_media_previous"
+        android:src="@drawable/ic_arrow_back"
         android:tint="#FFFFFF" />
 
     <TextView

@@ -13,11 +13,8 @@ class StationMapResolver(
     suspend fun resolveAll(
         stations: List<Station>,
         city: String
-    ): List<LatLng?> {
-        return stations.map { station ->
-            resolveStation(station, city)
-        }
-    }
+    ): List<LatLng?> =
+        stations.map { resolveStation(it, city) }
 
     private suspend fun resolveStation(
         station: Station,
@@ -37,7 +34,6 @@ class StationMapResolver(
         return geocodingRepo.geocode(queryText)
     }
 
-    private fun hasSavedCoordinates(station: Station): Boolean {
-        return station.latitude != 0.0 && station.longitude != 0.0
-    }
+    private fun hasSavedCoordinates(station: Station): Boolean =
+        station.latitude != 0.0 && station.longitude != 0.0
 }

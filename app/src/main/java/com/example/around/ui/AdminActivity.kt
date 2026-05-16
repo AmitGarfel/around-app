@@ -1,6 +1,9 @@
 package com.example.around.ui
 
 import android.os.Bundle
+import android.view.View
+import android.widget.ImageButton
+import android.widget.LinearLayout
 import android.widget.Toast
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
@@ -17,20 +20,35 @@ class AdminActivity : BaseActivity() {
     private val updateTourStatusUseCase = AppGraph.updateTourStatusUseCase
 
     private lateinit var recyclerView: RecyclerView
+    private lateinit var emptyStateLayout: LinearLayout
+    private lateinit var btnBack: ImageButton
     private lateinit var adapter: AdminTourAdapter
-    private val pendingList: MutableList<Tour> = mutableListOf()
+
+    private val pendingList = mutableListOf<Tour>()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_admin)
 
         setupBottomNav(R.id.nav_menu)
+        setupViews()
         setupRecyclerView()
+        setupBackButton()
         fetchPendingTours()
     }
 
-    private fun setupRecyclerView() {
+    override fun onResume() {
+        super.onResume()
+        refreshBottomNavSelection(R.id.nav_menu)
+    }
+
+    private fun setupViews() {
         recyclerView = findViewById(R.id.rvPendingTours)
+        emptyStateLayout = findViewById(R.id.emptyStateLayout)
+        btnBack = findViewById(R.id.btnBack)
+    }
+
+    private fun setupRecyclerView() {
         recyclerView.layoutManager = LinearLayoutManager(this)
 
         adapter = AdminTourAdapter(pendingList) { tourId, isApproved ->
@@ -40,21 +58,16 @@ class AdminActivity : BaseActivity() {
         recyclerView.adapter = adapter
     }
 
-    private fun handleTourAction(tourId: String, isApproved: Boolean) {
-        val position = AdminToursHelper.findPositionByTourId(pendingList, tourId)
-        if (position == -1) return
-
-        updateTourStatus(
-            tourId = tourId,
-            newStatus = AdminToursHelper.toStatus(isApproved),
-            position = position
-        )
+    private fun setupBackButton() {
+        btnBack.setOnClickListener {
+            onBackPressedDispatcher.onBackPressed()
+        }
     }
 
     private fun fetchPendingTours() {
         getPendingToursUseCase(
-            onSuccess = { list ->
-                updatePendingTours(list)
+            onSuccess = { tours ->
+                updatePendingTours(tours)
             },
             onError = {
                 showToast(AdminMessageFormatter.loadError())
@@ -62,13 +75,12 @@ class AdminActivity : BaseActivity() {
         )
     }
 
-    private fun updatePendingTours(list: List<Tour>) {
-        pendingList.clear()
-        pendingList.addAll(list)
-        adapter.notifyDataSetChanged()
-    }
+    private fun handleTourAction(tourId: String, isApproved: Boolean) {
+        val position = AdminToursHelper.findPositionByTourId(pendingList, tourId)
+        if (position == -1) return
 
-    private fun updateTourStatus(tourId: String, newStatus: String, position: Int) {
+        val newStatus = AdminToursHelper.toStatus(isApproved)
+
         updateTourStatusUseCase(
             tourId = tourId,
             newStatus = newStatus,
@@ -82,10 +94,38 @@ class AdminActivity : BaseActivity() {
         )
     }
 
+    private fun updatePendingTours(newList: List<Tour>) {
+        val oldSize = pendingList.size
+
+        pendingList.clear()
+        if (oldSize > 0) {
+            adapter.notifyItemRangeRemoved(0, oldSize)
+        }
+
+        pendingList.addAll(newList)
+        if (newList.isNotEmpty()) {
+            adapter.notifyItemRangeInserted(0, newList.size)
+        }
+
+        updateEmptyState()
+    }
+
     private fun removeTourFromList(position: Int) {
         val removed = AdminToursHelper.removeAt(pendingList, position)
-        if (removed) {
-            adapter.notifyItemRemoved(position)
+        if (!removed) return
+
+        adapter.notifyItemRemoved(position)
+        adapter.notifyItemRangeChanged(position, pendingList.size - position)
+        updateEmptyState()
+    }
+
+    private fun updateEmptyState() {
+        if (pendingList.isEmpty()) {
+            emptyStateLayout.visibility = View.VISIBLE
+            recyclerView.visibility = View.GONE
+        } else {
+            emptyStateLayout.visibility = View.GONE
+            recyclerView.visibility = View.VISIBLE
         }
     }
 

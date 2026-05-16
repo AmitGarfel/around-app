@@ -4,32 +4,14 @@ import com.example.around.ui.models.TravelModeUi
 
 object TravelModeMapper {
 
-    fun fromSpinnerPosition(position: Int): TravelModeUi {
-        return when (position) {
-            0 -> TravelModeUi(
-                dirMode = "driving",
-                navMode = "d"
-            )
-
-            1 -> TravelModeUi(
-                dirMode = "walking",
-                navMode = "w"
-            )
-
-            2 -> TravelModeUi(
-                dirMode = "bicycling",
-                navMode = "b"
-            )
-
-            3 -> TravelModeUi(
-                dirMode = "transit",
-                navMode = "r"
-            )
-
-            else -> TravelModeUi(
-                dirMode = "driving",
-                navMode = "d"
-            )
+    fun fromSpinnerPosition(position: Int): TravelModeUi =
+        when (position) {
+            0 -> TravelModeUi("driving", "d")
+            1 -> TravelModeUi("walking", "w")
+            2 -> TravelModeUi("bicycling", "b")
+            3 -> TravelModeUi("transit", "r")
+            else -> DEFAULT
         }
-    }
+
+    private val DEFAULT = TravelModeUi("driving", "d")
 }

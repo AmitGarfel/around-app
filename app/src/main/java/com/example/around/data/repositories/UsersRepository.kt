@@ -49,28 +49,6 @@ class UsersRepository(
             }
     }
 
-    fun getUserFullName(
-        uid: String,
-        onResult: (String?) -> Unit
-    ) {
-        db.collection("Users").document(uid).get()
-            .addOnSuccessListener { doc ->
-                val firstName = doc.getString("firstName")?.trim().orEmpty()
-                val lastName = doc.getString("lastName")?.trim().orEmpty()
-
-                val fullName = when {
-                    firstName.isNotBlank() && lastName.isNotBlank() -> "$firstName $lastName"
-                    firstName.isNotBlank() -> firstName
-                    else -> doc.getString("fullName")?.trim()
-                }
-
-                onResult(fullName)
-            }
-            .addOnFailureListener {
-                onResult(null)
-            }
-    }
-
     fun getUserProfile(
         uid: String,
         onResult: (firstName: String?, lastName: String?, email: String?) -> Unit

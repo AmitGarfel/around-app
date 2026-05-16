@@ -5,13 +5,12 @@ object AuthFormValidator {
     fun validateLogin(
         email: String,
         password: String
-    ): String? {
-        return when {
+    ): String? =
+        when {
             email.isBlank() -> "Please enter email"
             password.isBlank() -> "Please enter password"
             else -> null
         }
-    }
 
     fun validateRegister(
         firstName: String,
@@ -19,8 +18,8 @@ object AuthFormValidator {
         email: String,
         password: String,
         confirmPassword: String
-    ): String? {
-        return when {
+    ): String? =
+        when {
             firstName.isBlank() -> "Please enter first name"
             lastName.isBlank() -> "Please enter last name"
             email.isBlank() -> "Please enter email"
@@ -30,5 +29,4 @@ object AuthFormValidator {
             password != confirmPassword -> "Passwords do not match"
             else -> null
         }
-    }
 }

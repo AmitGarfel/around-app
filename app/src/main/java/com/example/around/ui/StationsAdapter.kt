@@ -25,9 +25,9 @@ class StationsAdapter(
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): StationVH {
-        val v = LayoutInflater.from(parent.context)
+        val view = LayoutInflater.from(parent.context)
             .inflate(R.layout.item_station, parent, false)
-        return StationVH(v)
+        return StationVH(view)
     }
 
     override fun onBindViewHolder(holder: StationVH, position: Int) {
@@ -37,22 +37,24 @@ class StationsAdapter(
         val isCurrent = position == currentStationIndex
         val isPassed = position < currentStationIndex
 
-        holder.tvName.text = station.name.ifBlank { "Station ${position + 1}" }
+        holder.tvName.text = station.name.ifBlank {
+            context.getString(R.string.station_number, position + 1)
+        }
 
         when {
             isCurrent -> {
                 holder.leftIndicator.visibility = View.VISIBLE
-                holder.tvIndex.text = (position + 1).toString()
+                holder.tvIndex.text = context.getString(R.string.station_index, position + 1)
                 holder.tvIndex.setTextColor(ContextCompat.getColor(context, R.color.black))
                 holder.tvName.setTypeface(null, Typeface.BOLD)
                 holder.tvName.setTextColor(ContextCompat.getColor(context, R.color.black))
                 holder.tvBadge.visibility = View.VISIBLE
-                holder.tvBadge.text = "Current"
+                holder.tvBadge.text = context.getString(R.string.current_station_badge)
             }
 
             isPassed -> {
                 holder.leftIndicator.visibility = View.INVISIBLE
-                holder.tvIndex.text = "✓"
+                holder.tvIndex.text = context.getString(R.string.station_done_mark)
                 holder.tvIndex.setTextColor(
                     ContextCompat.getColor(context, android.R.color.darker_gray)
                 )
@@ -65,7 +67,7 @@ class StationsAdapter(
 
             else -> {
                 holder.leftIndicator.visibility = View.INVISIBLE
-                holder.tvIndex.text = (position + 1).toString()
+                holder.tvIndex.text = context.getString(R.string.station_index, position + 1)
                 holder.tvIndex.setTextColor(ContextCompat.getColor(context, R.color.black))
                 holder.tvName.setTypeface(null, Typeface.NORMAL)
                 holder.tvName.setTextColor(ContextCompat.getColor(context, R.color.black))
@@ -77,10 +79,4 @@ class StationsAdapter(
     }
 
     override fun getItemCount(): Int = stations.size
-
-    fun updateCurrentStation(index: Int) {
-        if (stations.isEmpty()) return
-        currentStationIndex = index.coerceIn(0, stations.lastIndex)
-        notifyDataSetChanged()
-    }
 }

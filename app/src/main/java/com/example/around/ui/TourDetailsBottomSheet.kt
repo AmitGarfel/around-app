@@ -23,7 +23,7 @@ class TourDetailsBottomSheet : BottomSheetDialogFragment() {
         container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View {
-        val v = inflater.inflate(R.layout.bottomsheet_tour_details, container, false)
+        val view = inflater.inflate(R.layout.bottomsheet_tour_details, container, false)
 
         val name = requireArguments().getString(ARG_NAME) ?: ""
         val desc = requireArguments().getString(ARG_DESC) ?: ""
@@ -31,16 +31,18 @@ class TourDetailsBottomSheet : BottomSheetDialogFragment() {
         val tourId = requireArguments().getString(ARG_TOUR_ID) ?: ""
         val stations = requireArguments().getStringArrayList(ARG_STATIONS) ?: arrayListOf()
 
-        v.findViewById<TextView>(R.id.tvTourDetailName).text = name
-        v.findViewById<TextView>(R.id.tvTourDetailDesc).text = desc
+        view.findViewById<TextView>(R.id.tvTourDetailName).text = name
+        view.findViewById<TextView>(R.id.tvTourDetailDesc).text = desc
 
-        val stationsContainer = v.findViewById<LinearLayout>(R.id.llStationsContainer)
+        val stationsContainer = view.findViewById<LinearLayout>(R.id.llStationsContainer)
         stationsContainer.removeAllViews()
+
+        // Keep station rows visually consistent in mixed LTR/RTL content
         stationsContainer.layoutDirection = View.LAYOUT_DIRECTION_LTR
-        stationsContainer.gravity = Gravity.LEFT
+        stationsContainer.gravity = Gravity.START
 
         if (stations.isNotEmpty()) {
-            stationsContainer.addView(makeStationsTitle("Stations"))
+            stationsContainer.addView(makeStationsTitle(getString(R.string.stations_title)))
 
             stations.forEach { stationName ->
                 if (stationName.isBlank()) return@forEach
@@ -48,20 +50,22 @@ class TourDetailsBottomSheet : BottomSheetDialogFragment() {
             }
         }
 
-        val img = v.findViewById<ImageView>(R.id.ivTourDetailImage)
+        val image = view.findViewById<ImageView>(R.id.ivTourDetailImage)
         if (imageUrl.isNotEmpty()) {
             Glide.with(this)
                 .load(imageUrl)
                 .placeholder(android.R.drawable.ic_menu_gallery)
                 .error(android.R.drawable.stat_notify_error)
-                .into(img)
+                .into(image)
         } else {
-            img.setImageResource(android.R.drawable.ic_menu_gallery)
+            image.setImageResource(android.R.drawable.ic_menu_gallery)
         }
 
-        v.findViewById<View>(R.id.btnNotNow).setOnClickListener { dismiss() }
+        view.findViewById<View>(R.id.btnNotNow).setOnClickListener {
+            dismiss()
+        }
 
-        v.findViewById<View>(R.id.btnLetsGo).setOnClickListener {
+        view.findViewById<View>(R.id.btnLetsGo).setOnClickListener {
             if (tourId.isBlank()) {
                 dismiss()
                 return@setOnClickListener
@@ -73,7 +77,7 @@ class TourDetailsBottomSheet : BottomSheetDialogFragment() {
             dismiss()
         }
 
-        return v
+        return view
     }
 
     private fun makeStationsTitle(text: String): TextView {
@@ -84,7 +88,7 @@ class TourDetailsBottomSheet : BottomSheetDialogFragment() {
             setTextColor(0xFF2D2321.toInt())
 
             layoutDirection = View.LAYOUT_DIRECTION_LTR
-            gravity = Gravity.LEFT
+            gravity = Gravity.START
             textAlignment = View.TEXT_ALIGNMENT_VIEW_START
 
             layoutParams = LinearLayout.LayoutParams(
@@ -99,9 +103,8 @@ class TourDetailsBottomSheet : BottomSheetDialogFragment() {
     private fun makeStationRow(stationName: String): LinearLayout {
         return LinearLayout(requireContext()).apply {
             orientation = LinearLayout.HORIZONTAL
-
             layoutDirection = View.LAYOUT_DIRECTION_LTR
-            gravity = Gravity.LEFT or Gravity.CENTER_VERTICAL
+            gravity = Gravity.START or Gravity.CENTER_VERTICAL
 
             layoutParams = LinearLayout.LayoutParams(
                 LinearLayout.LayoutParams.MATCH_PARENT,
@@ -113,9 +116,8 @@ class TourDetailsBottomSheet : BottomSheetDialogFragment() {
             val pin = TextView(requireContext()).apply {
                 text = "📍"
                 textSize = 14f
-
                 layoutDirection = View.LAYOUT_DIRECTION_LTR
-                gravity = Gravity.LEFT
+                gravity = Gravity.START
 
                 layoutParams = LinearLayout.LayoutParams(
                     dp(22),
@@ -123,13 +125,13 @@ class TourDetailsBottomSheet : BottomSheetDialogFragment() {
                 )
             }
 
-            val nameTv = TextView(requireContext()).apply {
+            val nameTextView = TextView(requireContext()).apply {
                 text = stationName
                 textSize = 14f
                 setTextColor(0xFF2D2321.toInt())
 
                 layoutDirection = View.LAYOUT_DIRECTION_LTR
-                gravity = Gravity.LEFT
+                gravity = Gravity.START
                 textAlignment = View.TEXT_ALIGNMENT_VIEW_START
 
                 layoutParams = LinearLayout.LayoutParams(
@@ -140,7 +142,7 @@ class TourDetailsBottomSheet : BottomSheetDialogFragment() {
             }
 
             addView(pin)
-            addView(nameTv)
+            addView(nameTextView)
         }
     }
 

@@ -1,13 +1,16 @@
 package com.example.around.data.preferences
 
 import android.content.Context
+import androidx.core.content.edit
 
 class UserPrefsProvider(context: Context) {
 
     private val prefs = context.getSharedPreferences("around_prefs", Context.MODE_PRIVATE)
 
     fun saveLastCity(city: String) {
-        prefs.edit().putString(KEY_LAST_CITY, city).apply()
+        prefs.edit {
+            putString(KEY_LAST_CITY, city)
+        }
     }
 
     fun getLastCity(): String {

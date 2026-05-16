@@ -19,19 +19,14 @@ class StationSelectionManager {
         query: String,
         latLng: LatLng
     ) {
-        selectedStations[index] = SelectedStationData(
-            name = name,
-            query = query,
-            latLng = latLng
-        )
+        selectedStations[index] = SelectedStationData(name, query, latLng)
     }
 
-    fun hasStationAt(index: Int): Boolean {
-        return selectedStations[index] != null
-    }
+    fun hasStationAt(index: Int): Boolean =
+        selectedStations.containsKey(index)
 
-    fun buildStationsList(): List<Station> {
-        return selectedStations
+    fun buildStationsList(): List<Station> =
+        selectedStations
             .toSortedMap()
             .values
             .map {
@@ -42,5 +37,4 @@ class StationSelectionManager {
                     longitude = it.latLng.longitude
                 )
             }
-    }
 }

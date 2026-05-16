@@ -8,7 +8,6 @@ import android.widget.AutoCompleteTextView
 import android.widget.Button
 import android.widget.EditText
 import android.widget.ImageButton
-import android.widget.ImageView
 import android.widget.Spinner
 import android.widget.Toast
 import androidx.activity.result.contract.ActivityResultContracts
@@ -41,7 +40,7 @@ class CreateTourActivity : BaseActivity() {
             if (uri != null) {
                 selectedImageUri = uri
                 CreateTourImageHelper.applyPreview(
-                    findViewById<ImageView>(R.id.ivPreview),
+                    findViewById(R.id.ivPreview),
                     uri
                 )
                 Toast.makeText(this, "Image selected successfully ✅", Toast.LENGTH_SHORT).show()
@@ -91,7 +90,7 @@ class CreateTourActivity : BaseActivity() {
                 }
 
                 RESULT_CANCELED -> {
-                    // user canceled
+                    // User canceled place selection
                 }
             }
         }
@@ -146,7 +145,7 @@ class CreateTourActivity : BaseActivity() {
                 PackageManager.GET_META_DATA
             )
             appInfo.metaData?.getString("com.google.android.geo.API_KEY").orEmpty()
-        } catch (e: Exception) {
+        } catch (_: Exception) {
             ""
         }
     }
@@ -170,17 +169,18 @@ class CreateTourActivity : BaseActivity() {
     private fun setupCityAutocomplete() {
         val cityAuto = findViewById<AutoCompleteTextView>(R.id.etCity)
 
-        val cities = resources.getStringArray(R.array.cities_options)
+        val cities: List<String> = resources.getStringArray(R.array.cities_options)
             .map { CityNormalizer.canonical(it) }
             .distinct()
 
-        val adapter = ArrayAdapter(
-            this,
-            android.R.layout.simple_dropdown_item_1line,
-            cities
+        cityAuto.setAdapter(
+            ArrayAdapter(
+                this,
+                android.R.layout.simple_dropdown_item_1line,
+                cities
+            )
         )
 
-        cityAuto.setAdapter(adapter)
         cityAuto.threshold = 1
         cityAuto.setOnClickListener { cityAuto.showDropDown() }
     }

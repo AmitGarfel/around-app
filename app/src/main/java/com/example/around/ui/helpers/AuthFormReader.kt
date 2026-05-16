@@ -8,12 +8,11 @@ object AuthFormReader {
     fun readLogin(
         emailInput: EditText,
         passwordInput: EditText
-    ): AuthFormValues {
-        return AuthFormValues(
-            email = emailInput.text.toString().trim(),
-            password = passwordInput.text.toString().trim()
+    ): AuthFormValues =
+        AuthFormValues(
+            email = emailInput.value(),
+            password = passwordInput.value()
         )
-    }
 
     fun readRegister(
         firstNameInput: EditText,
@@ -21,13 +20,16 @@ object AuthFormReader {
         emailInput: EditText,
         passwordInput: EditText,
         confirmPasswordInput: EditText
-    ): AuthFormValues {
-        return AuthFormValues(
-            firstName = firstNameInput.text.toString().trim(),
-            lastName = lastNameInput.text.toString().trim(),
-            email = emailInput.text.toString().trim(),
-            password = passwordInput.text.toString().trim(),
-            confirmPassword = confirmPasswordInput.text.toString().trim()
+    ): AuthFormValues =
+        AuthFormValues(
+            firstName = firstNameInput.value(),
+            lastName = lastNameInput.value(),
+            email = emailInput.value(),
+            password = passwordInput.value(),
+            confirmPassword = confirmPasswordInput.value()
         )
-    }
+
+    // Extracts trimmed string from EditText
+    private fun EditText.value(): String =
+        text.toString().trim()
 }

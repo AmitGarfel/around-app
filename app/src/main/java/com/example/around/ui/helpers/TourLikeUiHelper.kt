@@ -2,6 +2,7 @@ package com.example.around.ui.helpers
 
 import com.example.around.domain.model.Tour
 
+// Handles optimistic like toggle and rollback
 object TourLikeUiHelper {
 
     data class PreviousState(
@@ -15,8 +16,9 @@ object TourLikeUiHelper {
             likesCount = tour.likesCount
         )
 
-        tour.isLikedByMe = !tour.isLikedByMe
-        tour.likesCount = if (tour.isLikedByMe) {
+        val isNowLiked = !tour.isLikedByMe
+        tour.isLikedByMe = isNowLiked
+        tour.likesCount = if (isNowLiked) {
             previous.likesCount + 1
         } else {
             (previous.likesCount - 1).coerceAtLeast(0)

@@ -37,6 +37,7 @@ class SettingsActivity : BaseActivity() {
                     tvFirstName.text = if (!firstName.isNullOrBlank()) firstName else "—"
                     tvLastName.text = if (!lastName.isNullOrBlank()) lastName else "—"
 
+                    // Prefer Auth email, then fallback to Firestore email
                     val finalEmail = when {
                         !user.email.isNullOrBlank() -> user.email
                         !firestoreEmail.isNullOrBlank() -> firestoreEmail

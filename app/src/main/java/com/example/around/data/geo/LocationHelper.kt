@@ -2,7 +2,9 @@ package com.example.around.data.geo
 
 import android.annotation.SuppressLint
 import android.content.Context
+import android.location.Address
 import android.location.Geocoder
+import android.os.Build
 import com.google.android.gms.location.LocationServices
 import com.google.android.gms.location.Priority
 import com.google.android.gms.maps.model.LatLng
@@ -15,13 +17,29 @@ class LocationHelper(private val context: Context) {
         val fused = LocationServices.getFusedLocationProviderClient(context)
 
         fun geocodeCity(lat: Double, lng: Double) {
-            try {
-                val geocoder = Geocoder(context, Locale.ENGLISH)
-                val addresses = geocoder.getFromLocation(lat, lng, 1)
-                val cityName = addresses?.firstOrNull()?.locality ?: "your area"
-                onResult(cityName)
-            } catch (_: Exception) {
-                onResult("local tours")
+            val geocoder = Geocoder(context, Locale.ENGLISH)
+
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+                // Use new async API for API 33+
+                geocoder.getFromLocation(lat, lng, 1, object : Geocoder.GeocodeListener {
+                    override fun onGeocode(addresses: MutableList<Address>) {
+                        val city = addresses.firstOrNull()?.locality ?: "your area"
+                        onResult(city)
+                    }
+
+                    override fun onError(errorMessage: String?) {
+                        onResult("local tours")
+                    }
+                })
+            } else {
+                try {
+                    @Suppress("DEPRECATION")
+                    val addresses = geocoder.getFromLocation(lat, lng, 1)
+                    val city = addresses?.firstOrNull()?.locality ?: "your area"
+                    onResult(city)
+                } catch (_: Exception) {
+                    onResult("local tours")
+                }
             }
         }
 
@@ -51,15 +69,9 @@ class LocationHelper(private val context: Context) {
             } else {
                 fused.getCurrentLocation(Priority.PRIORITY_BALANCED_POWER_ACCURACY, null)
                     .addOnSuccessListener { loc2 ->
-                        if (loc2 != null) {
-                            onResult(LatLng(loc2.latitude, loc2.longitude))
-                        } else {
-                            onResult(null)
-                        }
+                        onResult(loc2?.let { LatLng(it.latitude, it.longitude) })
                     }
-                    .addOnFailureListener {
-                        onResult(null)
-                    }
+                    .addOnFailureListener { onResult(null) }
             }
         }.addOnFailureListener {
             onResult(null)

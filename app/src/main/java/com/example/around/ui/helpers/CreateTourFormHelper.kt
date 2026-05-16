@@ -10,19 +10,15 @@ object CreateTourFormHelper {
     fun validateBasicFields(
         tourName: String,
         city: String
-    ): String? {
-        return when {
+    ): String? =
+        when {
             tourName.isBlank() -> "Please enter a tour name"
             city.isBlank() -> "Please enter a city"
             else -> null
         }
-    }
 
-    fun validateStations(stations: List<Station>): String? {
-        return if (stations.size < 2) {
-            "Please add at least 2 stations"
-        } else null
-    }
+    fun validateStations(stations: List<Station>): String? =
+        if (stations.size < 2) "Please add at least 2 stations" else null
 
     fun buildTour(
         name: String,
@@ -33,8 +29,8 @@ object CreateTourFormHelper {
         duration: String,
         stations: List<Station>,
         uid: String
-    ): Tour {
-        return Tour(
+    ): Tour =
+        Tour(
             name = name,
             city = city,
             description = description,
@@ -47,30 +43,25 @@ object CreateTourFormHelper {
             startLongitude = stations.first().longitude,
             createdBy = uid
         )
-    }
 
-    fun countFilledStations(values: List<String>): Int {
-        return values.count { it.trim().isNotEmpty() }
-    }
+    fun countFilledStations(values: List<String>): Int =
+        values.count { it.isNotBlank() }
 
-    fun suggestDuration(stationsCount: Int): String {
-        return when (stationsCount) {
+    fun suggestDuration(stationsCount: Int): String =
+        when (stationsCount) {
             0, 1, 2 -> "30–60 min"
             3, 4 -> "1–1.5 hours"
             else -> "1.5–2 hours"
         }
-    }
 
-    fun stationFieldIds(): List<Int> {
-        return listOf(
+    fun stationFieldIds(): List<Int> =
+        listOf(
             R.id.etStation1,
             R.id.etStation2,
             R.id.etStation3,
             R.id.etStation4
         )
-    }
 
-    fun stationFieldIdAt(index: Int): Int? {
-        return stationFieldIds().getOrNull(index)
-    }
+    fun stationFieldIdAt(index: Int): Int? =
+        stationFieldIds().getOrNull(index)
 }

@@ -14,23 +14,19 @@ class StationNavigator(
         city: String,
         travelMode: TravelModeUi
     ): Boolean {
-
         val searchText = PlaceQueryBuilder.build(station, city)
 
-        // Transit
         if (travelMode.dirMode == "transit") {
             if (searchText.isBlank()) return false
             navRepo.openTransitDirections(searchText)
             return true
         }
 
-        // Search
         if (searchText.isNotBlank()) {
             navRepo.navigateToSearchPlace(searchText, travelMode.navMode)
             return true
         }
 
-        // LatLng fallback
         if (hasSavedCoordinates(station)) {
             navRepo.navigateToLatLng(
                 latitude = station.latitude,
@@ -44,7 +40,6 @@ class StationNavigator(
         return false
     }
 
-    private fun hasSavedCoordinates(station: Station): Boolean {
-        return station.latitude != 0.0 && station.longitude != 0.0
-    }
+    private fun hasSavedCoordinates(station: Station): Boolean =
+        station.latitude != 0.0 && station.longitude != 0.0
 }

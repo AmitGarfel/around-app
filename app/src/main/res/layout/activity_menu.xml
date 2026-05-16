@@ -98,15 +98,23 @@
                         android:orientation="vertical"
                         android:layoutDirection="ltr">
 
-                        <ImageButton
-                            android:id="@+id/btnExploreRegular"
-                            android:layout_width="82dp"
-                            android:layout_height="82dp"
-                            android:background="@drawable/rounded_yellow_bg"
-                            android:padding="20dp"
-                            android:src="@android:drawable/ic_menu_search"
-                            android:contentDescription="Explore"
-                            app:tint="#2D2321" />
+                        <com.google.android.material.card.MaterialCardView
+                            android:layout_width="88dp"
+                            android:layout_height="88dp"
+                            app:cardCornerRadius="24dp"
+                            app:cardElevation="0dp"
+                            app:cardBackgroundColor="#E0B43C">
+
+                            <ImageButton
+                                android:id="@+id/btnExploreRegular"
+                                android:layout_width="match_parent"
+                                android:layout_height="match_parent"
+                                android:background="?attr/selectableItemBackgroundBorderless"
+                                android:padding="22dp"
+                                android:src="@android:drawable/ic_menu_search"
+                                android:contentDescription="Explore"
+                                app:tint="#2D2321" />
+                        </com.google.android.material.card.MaterialCardView>
 
                         <TextView
                             android:layout_width="wrap_content"
@@ -119,7 +127,7 @@
                     </LinearLayout>
 
                     <Space
-                        android:layout_width="28dp"
+                        android:layout_width="22dp"
                         android:layout_height="1dp" />
 
                     <LinearLayout
@@ -130,15 +138,23 @@
                         android:orientation="vertical"
                         android:layoutDirection="ltr">
 
-                        <ImageButton
-                            android:id="@+id/btnCreateRegular"
-                            android:layout_width="82dp"
-                            android:layout_height="82dp"
-                            android:background="@drawable/rounded_yellow_bg"
-                            android:padding="20dp"
-                            android:src="@android:drawable/ic_menu_edit"
-                            android:contentDescription="Create"
-                            app:tint="#2D2321" />
+                        <com.google.android.material.card.MaterialCardView
+                            android:layout_width="88dp"
+                            android:layout_height="88dp"
+                            app:cardCornerRadius="24dp"
+                            app:cardElevation="0dp"
+                            app:cardBackgroundColor="#E0B43C">
+
+                            <ImageButton
+                                android:id="@+id/btnCreateRegular"
+                                android:layout_width="match_parent"
+                                android:layout_height="match_parent"
+                                android:background="?attr/selectableItemBackgroundBorderless"
+                                android:padding="22dp"
+                                android:src="@android:drawable/ic_menu_edit"
+                                android:contentDescription="Create"
+                                app:tint="#2D2321" />
+                        </com.google.android.material.card.MaterialCardView>
 
                         <TextView
                             android:layout_width="wrap_content"
@@ -168,15 +184,23 @@
                         android:orientation="vertical"
                         android:layoutDirection="ltr">
 
-                        <ImageButton
-                            android:id="@+id/btnExploreAdmin"
-                            android:layout_width="74dp"
-                            android:layout_height="74dp"
-                            android:background="@drawable/rounded_yellow_bg"
-                            android:padding="18dp"
-                            android:src="@android:drawable/ic_menu_search"
-                            android:contentDescription="Explore"
-                            app:tint="#2D2321" />
+                        <com.google.android.material.card.MaterialCardView
+                            android:layout_width="82dp"
+                            android:layout_height="82dp"
+                            app:cardCornerRadius="22dp"
+                            app:cardElevation="0dp"
+                            app:cardBackgroundColor="#E0B43C">
+
+                            <ImageButton
+                                android:id="@+id/btnExploreAdmin"
+                                android:layout_width="match_parent"
+                                android:layout_height="match_parent"
+                                android:background="?attr/selectableItemBackgroundBorderless"
+                                android:padding="20dp"
+                                android:src="@android:drawable/ic_menu_search"
+                                android:contentDescription="Explore"
+                                app:tint="#2D2321" />
+                        </com.google.android.material.card.MaterialCardView>
 
                         <TextView
                             android:layout_width="wrap_content"
@@ -195,15 +219,23 @@
                         android:orientation="vertical"
                         android:layoutDirection="ltr">
 
-                        <ImageButton
-                            android:id="@+id/btnCreateAdmin"
-                            android:layout_width="74dp"
-                            android:layout_height="74dp"
-                            android:background="@drawable/rounded_yellow_bg"
-                            android:padding="18dp"
-                            android:src="@android:drawable/ic_menu_edit"
-                            android:contentDescription="Create"
-                            app:tint="#2D2321" />
+                        <com.google.android.material.card.MaterialCardView
+                            android:layout_width="82dp"
+                            android:layout_height="82dp"
+                            app:cardCornerRadius="22dp"
+                            app:cardElevation="0dp"
+                            app:cardBackgroundColor="#E0B43C">
+
+                            <ImageButton
+                                android:id="@+id/btnCreateAdmin"
+                                android:layout_width="match_parent"
+                                android:layout_height="match_parent"
+                                android:background="?attr/selectableItemBackgroundBorderless"
+                                android:padding="20dp"
+                                android:src="@android:drawable/ic_menu_edit"
+                                android:contentDescription="Create"
+                                app:tint="#2D2321" />
+                        </com.google.android.material.card.MaterialCardView>
 
                         <TextView
                             android:layout_width="wrap_content"
@@ -222,15 +254,23 @@
                         android:orientation="vertical"
                         android:layoutDirection="ltr">
 
-                        <ImageButton
-                            android:id="@+id/btnAdmin"
-                            android:layout_width="74dp"
-                            android:layout_height="74dp"
-                            android:background="@drawable/rounded_yellow_bg"
-                            android:padding="18dp"
-                            android:src="@android:drawable/ic_lock_idle_lock"
-                            android:contentDescription="Admin"
-                            app:tint="#2D2321" />
+                        <com.google.android.material.card.MaterialCardView
+                            android:layout_width="82dp"
+                            android:layout_height="82dp"
+                            app:cardCornerRadius="22dp"
+                            app:cardElevation="0dp"
+                            app:cardBackgroundColor="#E0B43C">
+
+                            <ImageButton
+                                android:id="@+id/btnAdmin"
+                                android:layout_width="match_parent"
+                                android:layout_height="match_parent"
+                                android:background="?attr/selectableItemBackgroundBorderless"
+                                android:padding="20dp"
+                                android:src="@android:drawable/ic_lock_idle_lock"
+                                android:contentDescription="Admin"
+                                app:tint="#2D2321" />
+                        </com.google.android.material.card.MaterialCardView>
 
                         <TextView
                             android:layout_width="wrap_content"
@@ -246,7 +286,7 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="30dp"
-                    android:text="Recommended for you"
+                    android:text="Recommended near you"
                     android:textColor="#7A5901"
                     android:textSize="13sp"
                     android:textStyle="bold"
@@ -255,64 +295,78 @@
                     android:layoutDirection="ltr"
                     android:textDirection="ltr" />
 
-                <LinearLayout
+                <com.google.android.material.card.MaterialCardView
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_marginTop="10dp"
-                    android:background="@drawable/rounded_yellow_bg"
-                    android:gravity="center_vertical"
-                    android:orientation="horizontal"
-                    android:paddingHorizontal="12dp"
-                    android:paddingVertical="14dp"
-                    android:layoutDirection="ltr">
-
-                    <ImageView
-                        android:layout_width="20dp"
-                        android:layout_height="20dp"
-                        android:src="@drawable/ic_location_pin"
-                        android:contentDescription="@null"
-                        app:tint="#5D4300" />
+                    android:layout_marginTop="12dp"
+                    app:cardCornerRadius="22dp"
+                    app:cardElevation="0dp"
+                    app:strokeWidth="1dp"
+                    app:strokeColor="#E8D9A8"
+                    app:cardBackgroundColor="#FFFDF5">
 
                     <LinearLayout
-                        android:layout_width="0dp"
+                        android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:layout_weight="1"
-                        android:layout_marginStart="10dp"
-                        android:orientation="vertical"
+                        android:orientation="horizontal"
+                        android:gravity="center_vertical"
+                        android:paddingHorizontal="16dp"
+                        android:paddingVertical="18dp"
                         android:layoutDirection="ltr">
 
-                        <TextView
-                            android:id="@+id/tvQuickInfo"
-                            android:layout_width="match_parent"
-                            android:layout_height="wrap_content"
-                            android:text="Near you: Hod Hasharon Tours"
-                            android:textColor="#5D4300"
-                            android:textStyle="bold"
-                            android:textSize="15sp"
-                            android:maxLines="1"
-                            android:gravity="left"
-                            android:textAlignment="gravity"
-                            android:layoutDirection="ltr"
-                            android:textDirection="ltr"
-                            android:autoSizeTextType="uniform"
-                            android:autoSizeMinTextSize="11sp"
-                            android:autoSizeMaxTextSize="15sp"
-                            android:autoSizeStepGranularity="1sp" />
+                        <FrameLayout
+                            android:layout_width="32dp"
+                            android:layout_height="32dp"
+                            android:background="@drawable/bg_location_circle">
 
-                        <TextView
-                            android:id="@+id/tvQuickInfoSub"
-                            android:layout_width="match_parent"
+                            <ImageView
+                                android:layout_width="16dp"
+                                android:layout_height="16dp"
+                                android:layout_gravity="center"
+                                android:src="@drawable/ic_location_pin"
+                                android:contentDescription="@null"
+                                app:tint="#7A5901" />
+                        </FrameLayout>
+
+                        <LinearLayout
+                            android:layout_width="0dp"
                             android:layout_height="wrap_content"
-                            android:layout_marginTop="2dp"
-                            android:text="Based on your current location"
-                            android:textColor="#555555"
-                            android:textSize="14sp"
-                            android:gravity="left"
-                            android:textAlignment="gravity"
-                            android:layoutDirection="ltr"
-                            android:textDirection="ltr" />
+                            android:layout_weight="1"
+                            android:layout_marginStart="12dp"
+                            android:orientation="vertical"
+                            android:layoutDirection="ltr">
+
+                            <TextView
+                                android:id="@+id/tvQuickInfo"
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:text="Hod Hasharon Tours"
+                                android:textColor="#3A2A00"
+                                android:textStyle="bold"
+                                android:textSize="16sp"
+                                android:maxLines="2"
+                                android:ellipsize="end"
+                                android:gravity="left"
+                                android:textAlignment="gravity"
+                                android:layoutDirection="ltr"
+                                android:textDirection="ltr" />
+
+                            <TextView
+                                android:id="@+id/tvQuickInfoSub"
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:layout_marginTop="4dp"
+                                android:text="Near you • Based on your current location"
+                                android:textColor="#7B7B7B"
+                                android:textSize="13sp"
+                                android:gravity="left"
+                                android:textAlignment="gravity"
+                                android:layoutDirection="ltr"
+                                android:textDirection="ltr" />
+                        </LinearLayout>
                     </LinearLayout>
-                </LinearLayout>
+
+                </com.google.android.material.card.MaterialCardView>
 
             </LinearLayout>
         </com.google.android.material.card.MaterialCardView>
