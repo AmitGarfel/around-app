@@ -1,10 +1,10 @@
 AROUND – Smart City Exploration App
-#Overview
+# Overview
 AROUND is an Android application that enables users to discover personalized urban routes based on their mood,
 time of day, and location. The app offers short tours consisting of 2–4 stations, combining cultural,
 culinary, and relaxing experiences to provide an engaging and convenient way to explore cities.
 
-#Features
+# Features
 The app allows users to explore routes based on mood (Culture, Food, Relax, or Surprise) and filter them by
 time of day (Morning, Afternoon, or Evening). By default, the app detects the user’s current time and location
 and suggests relevant routes accordingly.
@@ -23,7 +23,7 @@ An admin system is also implemented, allowing authorized users to approve or rej
 The admin interface is only visible to users with appropriate permissions, while regular users are presented 
 with Explore and Create options in the menu.
 
-#Route Configuration
+# Route Configuration
 
 When creating a new route, users define several parameters:
 
@@ -36,7 +36,7 @@ Estimated duration
 List of stations (2–4 stations)
 A single representative image
 
-#Navigation & Maps
+# Navigation & Maps
 The app integrates Google Maps to display route stations on an interactive map,
 including visual connections between stations.
 During usage,users can select their preferred travel mode via a Spinner (driving, public transport, walking, or cycling)
@@ -46,12 +46,12 @@ The “Next Station” button allows users to move between stations within the a
 To start actual navigation, users must press the “Navigate via Google Maps” button,
 which opens navigation to the selected station in the Google Maps app.
 
-#Architecture
+# Architecture
 The application is designed following Clean Architecture principles and is divided into three main layers:
 UI (presentation), Domain (business logic), and Data (data access). This structure improves code modularity, readability,
 and scalability.
 
-#Tech Stack
+# Tech Stack
 Kotlin, Android SDK, Firebase (Authentication, Firestore, Storage), Google Maps SDK, Geocoding API, and Material Design components.
 # Screenshots
 
@@ -66,3 +66,9 @@ Kotlin, Android SDK, Firebase (Authentication, Firestore, Storage), Google Maps 
 
 ## Main Menu
 ![Menu](screenshots/menu%20(2).jpeg)
+
+# Demo Video
+
+Watch the full application demo here:
+
+https://youtu.be/B_1Vo8LvnSE
