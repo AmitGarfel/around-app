@@ -28,7 +28,9 @@ class GeocodingRepository(context: Context) {
         val trimmedQuery = query.trim()
         if (trimmedQuery.isBlank()) return@withContext null
 
-        cache[trimmedQuery]?.let { return@withContext it }
+        if (cache.containsKey(trimmedQuery)) {
+            return@withContext cache[trimmedQuery]
+        }
 
         val finalQuery = if (
             !trimmedQuery.contains("ישראל", ignoreCase = true) &&
@@ -43,10 +45,7 @@ class GeocodingRepository(context: Context) {
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
                 geocodeApi33(finalQuery)
             } else {
-                @Suppress("DEPRECATION")
-                geocoder.getFromLocationName(finalQuery, 1)
-                    ?.firstOrNull()
-                    ?.toLatLng()
+                geocodeLegacy(finalQuery)
             }
         } catch (e: Exception) {
             Log.e("GEO_DEBUG", e.localizedMessage ?: "Error")
@@ -57,23 +56,24 @@ class GeocodingRepository(context: Context) {
         result
     }
 
+    @androidx.annotation.RequiresApi(Build.VERSION_CODES.TIRAMISU)
     private suspend fun geocodeApi33(query: String): LatLng? =
         suspendCancellableCoroutine { continuation ->
-            geocoder.getFromLocationName(
-                query,
-                1,
-                object : Geocoder.GeocodeListener {
-                    override fun onGeocode(addresses: MutableList<Address>) {
-                        continuation.resume(addresses.firstOrNull()?.toLatLng())
-                    }
-
-                    override fun onError(errorMessage: String?) {
-                        Log.e("GEO_DEBUG", errorMessage ?: "Error")
-                        continuation.resume(null)
-                    }
+            geocoder.getFromLocationName(query, 1) { addresses ->
+                if (continuation.isActive) {
+                    continuation.resume(addresses.firstOrNull()?.toLatLng())
                 }
-            )
+            }
         }
 
-    private fun Address.toLatLng(): LatLng = LatLng(latitude, longitude)
+    @Suppress("DEPRECATION")
+    private fun geocodeLegacy(query: String): LatLng? {
+        return geocoder.getFromLocationName(query, 1)
+            ?.firstOrNull()
+            ?.toLatLng()
+    }
+
+    private fun Address.toLatLng(): LatLng {
+        return LatLng(latitude, longitude)
+    }
 }
